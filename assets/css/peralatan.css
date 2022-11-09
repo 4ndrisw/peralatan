@@ -1,0 +1,40 @@
+
+.peralatan-update{ background-color:#ddd; }
+
+body #peralatan-preview .peralatan-items table tbody td.description span{
+    color: #d1d3ea !important;
+}
+
+.customers.viewperalatan #wrapper{
+    margin-left: 0;
+}
+
+@media (max-width: 1430px){
+    .customers.viewperalatan .panel_s {
+        width: 100%;
+    }
+}
+
+tr.has-row-options-2 a,
+tr.has-row-options-2,
+tr.peralatan_status_2 {
+    background: #004803;
+}
+
+tr.has-row-options-1 a,
+tr.has-row-options-1,
+tr.peralatan_status_1 {
+    background: #b7ab00;
+    color: #000;
+}
+
+.customers.peralatan-view #wrapper {
+    margin-left: 0;
+}
+
+body table.peralatan-items-preview td.description span strong{
+    color: #ececec !important;
+}
+body table.peralatan-items-preview td.description span {
+    color: #989898 !important;
+}
