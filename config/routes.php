@@ -11,3 +11,6 @@ $route['peralatan/list'] = 'myperalatan/list';
 $route['peralatan/show/(:num)/(:any)'] = 'myperalatan/show/$1/$2';
 $route['peralatan/office/(:num)/(:any)'] = 'myperalatan/office/$1/$2';
 $route['peralatan/pdf/(:num)'] = 'myperalatan/pdf/$1';
+
+
+$route['peralatan/product_services/items_create'] = 'product_services/items_create/$1';

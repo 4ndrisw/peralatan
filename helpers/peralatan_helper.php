@@ -188,6 +188,48 @@ function format_peralatan_status($status, $classes = '', $label = true)
     return $status;
 }
 
+function format_peralatan_dropdown($status, $classes = '', $label = true)
+{
+    $id = $status;
+    $label_class = 'default';
+
+    if ($status == 1) {
+        $status      = _l('peralatan_status_draft');
+        $label_class = 'default';
+    } elseif ($status == 2) {
+        $status      = _l('peralatan_status_sent');
+        $label_class = 'info';
+    } elseif ($status == 3) {
+        $status      = _l('peralatan_status_open');
+        $label_class = 'warning';
+    } elseif ($status == 4) {
+        $status      = _l('peralatan_status_revised');
+        $label_class = 'info';
+    } elseif ($status == 5) {
+        $status      = _l('peralatan_status_declined');
+        $label_class = 'danger';
+    } elseif ($status == 6) {
+        $status      = _l('peralatan_status_accepted');
+        $label_class = 'success';
+    }
+
+    if ($label == true) {
+        //$button = '<button type="button" class="btn btn-status btn-xs btn-'. $label_class .'">'. $status .'</button>';
+        //$button .= '<button type="button" class="btn btn-xs btn-'. $label_class .' dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+        //$button .=            '<span class="sr-only">Toggle Dropdown</span>';
+        //$button .=          '</button>';
+        
+        $button =  '<button type="button" class="btn btn-xs btn-block btn-'. $label_class .' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+        $button .= $status;
+        $button .= '</button>';
+
+        return $button;
+        //        return '<span class="-' . $label_class . ' ' . $classes . ' s-status peralatan-status-' . $id . '">' . $status . '</span>';
+    }
+
+    return $status;
+}
+
 /**
  * Function that format peralatan number based on the prefix option and the peralatan id
  * @param  mixed $id peralatan id

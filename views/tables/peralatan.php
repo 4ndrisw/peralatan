@@ -116,29 +116,24 @@ foreach ($rResult as $aRow) {
     $row[] = _d($aRow['datecreated']);
             $statuses = $this->ci->peralatan_model->get_statuses();
             
-            $statusDropdown = '';
-                //if (!$locked) {
-                    $statusDropdown .= '<div class="dropdown inline-block mleft5 table-export-exclude">';
-                    $statusDropdown .= '<a href="#" style="font-size:14px;vertical-align:middle;" class="dropdown-toggle text-dark" id="tableLeadsStatus-' . $aRow[db_prefix() . 'peralatan.id'] . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-                    $statusDropdown .= '<status data-toggle="tooltip" title="' . _l('ticket_single_change_status') . '"><i class="fa fa-caret-down" aria-hidden="true"></i></status>';
-                    $statusDropdown .= '</a>';
 
-                    $statusDropdown .= '<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="tableLeadsStatus-' . $aRow[db_prefix() . 'peralatan.id'] . '">';
-                    foreach ($statuses as $peralatanChangeStatus) {
-                        if ($aRow['status'] != $peralatanChangeStatus) {
-                            $statusDropdown .= '<li>
-                          <a href="#" onclick="peralatan_mark_action_status(' . $peralatanChangeStatus . ',' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">
-                             ' . format_peralatan_status($peralatanChangeStatus) . '
-                          </a>
-                       </li>';
-                        }
-                    }
-                    $statusDropdown .= '</ul>';
-                    $statusDropdown .= '</div>';
-                //}
-                $statusDropdown .= '</status>';
-    //$row[] = format_peralatan_status($aRow['status']);
-    $row[] = format_peralatan_status($aRow['status']) .' '. $statusDropdown;
+    $dropdown =        '<div class="btn-group btn-group-status">';
+    $dropdown .=          format_peralatan_dropdown($aRow['status']);
+    $dropdown .=          '<div class="dropdown-menu status">';
+                            foreach ($statuses as $peralatanChangeStatus) {
+                                if ($aRow['status'] != $peralatanChangeStatus) {
+                                    $dropdown .= 
+                                    '<li class="'. strtolower(format_peralatan_dropdown($peralatanChangeStatus,'',false)) .'">
+                                        <a href="#" onclick="peralatan_mark_action_status(' . $peralatanChangeStatus . ',' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">
+                                         ' . format_peralatan_dropdown($peralatanChangeStatus,'',false) . '
+                                        </a>
+                                    </li>';
+                                }
+                            }
+
+    $dropdown .=          '</div>';
+    $dropdown .=        '</div>';
+    $row[] = $dropdown;
 
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
@@ -146,8 +141,6 @@ foreach ($rResult as $aRow) {
     }
 
     $row['DT_RowClass'] = 'has-row-options';
-
-    $row = hooks()->apply_filters('peralatan_table_row_data', $row, $aRow);
 
     $output['aaData'][] = $row;
 }
