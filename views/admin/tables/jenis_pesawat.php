@@ -15,7 +15,7 @@ $aColumns = array_merge($aColumns, [
     //'t1.taxrate as taxrate_1',
     //'t2.taxrate as taxrate_2',
     //'unit',
-    db_prefix() . 'items_groups.name as group_name',
+    db_prefix() . 'kelompok_alat.name as group_name',
     ]);
 
 $sIndexColumn = 'id';
@@ -24,7 +24,7 @@ $sTable       = db_prefix() . 'items';
 $join = [
     //'LEFT JOIN ' . db_prefix() . 'taxes t1 ON t1.id = ' . db_prefix() . 'items.tax',
     //'LEFT JOIN ' . db_prefix() . 'taxes t2 ON t2.id = ' . db_prefix() . 'items.tax2',
-    'LEFT JOIN ' . db_prefix() . 'items_groups ON ' . db_prefix() . 'items_groups.id = ' . db_prefix() . 'items.group_id',
+    'LEFT JOIN ' . db_prefix() . 'kelompok_alat ON ' . db_prefix() . 'kelompok_alat.id = ' . db_prefix() . 'items.group_id',
     ];
 $additionalSelect = [
     db_prefix() . 'items.id',
@@ -69,11 +69,11 @@ foreach ($rResult as $aRow) {
     }
 
     if (has_permission('items', '', 'delete')) {
-        $descriptionOutput .= ' | <a href="' . admin_url('invoice_items/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
+        $descriptionOutput .= ' | <a href="' . admin_url('jenis_pesawat/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 
     if (has_permission('items', '', 'create')) {
-        $descriptionOutput .= ' | <a href="' . admin_url('invoice_items/copy/' . $aRow['id']) . '" class=" _edit_item">' . _l('copy') . '</a>';
+        $descriptionOutput .= ' | <a href="' . admin_url('jenis_pesawat/copy/' . $aRow['id']) . '" class=" _edit_item">' . _l('copy') . '</a>';
     }
 
     $descriptionOutput .= '</div>';

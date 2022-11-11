@@ -2,14 +2,15 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Invoice_items extends AdminController
+class Jenis_pesawat extends AdminController
 {
     private $not_importable_fields = ['id'];
 
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('invoice_items_model');
+        include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
+        $this->load->model('jenis_pesawat_model');
     }
 
     /* List all available items */
@@ -19,17 +20,10 @@ class Invoice_items extends AdminController
             access_denied('Invoice Items');
         }
 
-        $this->load->model('taxes_model');
-        $data['taxes']        = $this->taxes_model->get();
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
-        $this->load->model('currencies_model');
-        $data['currencies'] = $this->currencies_model->get();
-
-        $data['base_currency'] = $this->currencies_model->get_base_currency();
-
-        $data['title'] = _l('invoice_items');
-        $this->load->view('admin/invoice_items/manage', $data);
+        $data['title'] = _l('jenis_pesawat');
+        $this->load->view('admin/jenis_pesawat/manage', $data);
     }
 
     public function table()
@@ -38,8 +32,7 @@ class Invoice_items extends AdminController
             ajax_access_denied();
         }
         //$this->app->get_table_data(module_views_path('peralatan', 'admin/tables/table'));
-        $this->app->get_table_data(module_views_path(PERALATAN_MODULE_NAME, 'admin/tables/invoice_items'));
-        //$this->app->get_table_data('invoice_items');
+        $this->app->get_table_data(module_views_path(PERALATAN_MODULE_NAME, 'admin/tables/jenis_pesawat'));
     }
 
     /* Edit or update items / ajax request /*/
@@ -54,7 +47,7 @@ class Invoice_items extends AdminController
                         echo _l('access_denied');
                         die;
                     }
-                    $id      = $this->invoice_items_model->add($data);
+                    $id      = $this->jenis_pesawat_model->add($data);
                     $success = false;
                     $message = '';
                     if ($id) {
@@ -64,7 +57,7 @@ class Invoice_items extends AdminController
                     echo json_encode([
                         'success' => $success,
                         'message' => $message,
-                        'item'    => $this->invoice_items_model->get($id),
+                        'item'    => $this->jenis_pesawat_model->get($id),
                     ]);
                 } else {
                     if (!has_permission('items', '', 'edit')) {
@@ -72,7 +65,7 @@ class Invoice_items extends AdminController
                         echo _l('access_denied');
                         die;
                     }
-                    $success = $this->invoice_items_model->edit($data);
+                    $success = $this->jenis_pesawat_model->edit($data);
                     $message = '';
                     if ($success) {
                         $message = _l('updated_successfully', _l('sales_item'));
@@ -118,33 +111,33 @@ class Invoice_items extends AdminController
         }
 
         $data['title'] = _l('import');
-        $this->load->view('admin/invoice_items/import', $data);
+        $this->load->view('admin/jenis_pesawat/import', $data);
     }
 
     public function add_group()
     {
         if ($this->input->post() && has_permission('items', '', 'create')) {
-            $this->invoice_items_model->add_group($this->input->post());
-            set_alert('success', _l('added_successfully', _l('item_group')));
+            $this->jenis_pesawat_model->add_group($this->input->post());
+            set_alert('success', _l('added_successfully', _l('kelompok_alat')));
         }
     }
 
     public function update_group($id)
     {
         if ($this->input->post() && has_permission('items', '', 'edit')) {
-            $this->invoice_items_model->edit_group($this->input->post(), $id);
-            set_alert('success', _l('updated_successfully', _l('item_group')));
+            $this->jenis_pesawat_model->edit_group($this->input->post(), $id);
+            set_alert('success', _l('updated_successfully', _l('kelompok_alat')));
         }
     }
 
     public function delete_group($id)
     {
         if (has_permission('items', '', 'delete')) {
-            if ($this->invoice_items_model->delete_group($id)) {
-                set_alert('success', _l('deleted', _l('item_group')));
+            if ($this->jenis_pesawat_model->delete_group($id)) {
+                set_alert('success', _l('deleted', _l('kelompok_alat')));
             }
         }
-        redirect(admin_url('invoice_items?groups_modal=true'));
+        redirect(admin_url('peralatan/jenis_pesawat?groups_modal=true'));
     }
 
     /* Delete item*/
@@ -155,18 +148,18 @@ class Invoice_items extends AdminController
         }
 
         if (!$id) {
-            redirect(admin_url('invoice_items'));
+            redirect(admin_url('peralatan/jenis_pesawat'));
         }
 
-        $response = $this->invoice_items_model->delete($id);
+        $response = $this->jenis_pesawat_model->delete($id);
         if (is_array($response) && isset($response['referenced'])) {
-            set_alert('warning', _l('is_referenced', _l('invoice_item_lowercase')));
+            set_alert('warning', _l('is_referenced', _l('jenis_pesawat_lowercase')));
         } elseif ($response == true) {
-            set_alert('success', _l('deleted', _l('invoice_item')));
+            set_alert('success', _l('deleted', _l('jenis_pesawat')));
         } else {
-            set_alert('warning', _l('problem_deleting', _l('invoice_item_lowercase')));
+            set_alert('warning', _l('problem_deleting', _l('jenis_pesawat_lowercase')));
         }
-        redirect(admin_url('invoice_items'));
+        redirect(admin_url('peralatan/jenis_pesawat'));
     }
 
     public function bulk_action()
@@ -180,7 +173,7 @@ class Invoice_items extends AdminController
                 foreach ($ids as $id) {
                     if ($this->input->post('mass_delete')) {
                         if ($has_permission_delete) {
-                            if ($this->invoice_items_model->delete($id)) {
+                            if ($this->jenis_pesawat_model->delete($id)) {
                                 $total_deleted++;
                             }
                         }
@@ -197,7 +190,7 @@ class Invoice_items extends AdminController
     public function search()
     {
         if ($this->input->post() && $this->input->is_ajax_request()) {
-            echo json_encode($this->invoice_items_model->search($this->input->post('q')));
+            echo json_encode($this->jenis_pesawat_model->search($this->input->post('q')));
         }
     }
 
@@ -205,7 +198,7 @@ class Invoice_items extends AdminController
     public function get_item_by_id($id)
     {
         if ($this->input->is_ajax_request()) {
-            $item                     = $this->invoice_items_model->get($id);
+            $item                     = $this->jenis_pesawat_model->get($id);
             $item->long_description   = nl2br($item->long_description);
             $item->custom_fields_html = render_custom_fields('items', $id, [], ['items_pr' => true]);
             $item->custom_fields      = [];
@@ -232,16 +225,16 @@ class Invoice_items extends AdminController
             access_denied('Create Item');
         }
 
-        $data = (array) $this->invoice_items_model->get($id);
+        $data = (array) $this->jenis_pesawat_model->get($id);
 
-        $id = $this->invoice_items_model->copy($data);
+        $id = $this->jenis_pesawat_model->copy($data);
 
         if ($id) {
             set_alert('success', _l('item_copy_success'));
-            return redirect(admin_url('invoice_items?id=' . $id));
+            return redirect(admin_url('peralatan/jenis_pesawat?id=' . $id));
         }
 
         set_alert('warning', _l('item_copy_fail'));
-        return redirect(admin_url('invoice_items'));
+        return redirect(admin_url('peralatan/jenis_pesawat'));
     }
 }

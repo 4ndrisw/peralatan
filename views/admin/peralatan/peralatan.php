@@ -234,7 +234,7 @@
             </div>
          </div>
          <?php echo form_close(); ?>
-         <?php $this->load->view('admin/invoice_items/item'); ?>
+         <?php $this->load->view('admin/jenis_pesawat/item'); ?>
       </div>
       <div class="btn-bottom-pusher"></div>
    </div>

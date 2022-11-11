@@ -44,15 +44,15 @@
                 <div class="_buttons tw-mb-2 sm:tw-mb-4 tw-inline-block tw-w-full">
                     <a href="#" class="btn btn-primary pull-left" data-toggle="modal" data-target="#sales_item_modal">
                         <i class="fa-regular fa-plus tw-mr-1"></i>
-                        <?php echo _l('new_invoice_item'); ?>
+                        <?php echo _l('new_jenis_pesawat'); ?>
                     </a>
-                    <a href="<?php echo admin_url('invoice_items/import'); ?>" class="btn btn-primary pull-left mleft5">
+                    <a href="<?php echo admin_url('peralatan/jenis_pesawat/import'); ?>" class="btn btn-primary pull-left mleft5">
                         <i class="fa-solid fa-upload tw-mr-1"></i>
                         <?php echo _l('import_items'); ?>
                     </a>
                     <a href="#" class="btn btn-default pull-left mleft5" data-toggle="modal" data-target="#groups">
                         <i class="fa-solid fa-layer-group tw-mr-1"></i>
-                        <?php echo _l('item_groups'); ?>
+                        <?php echo _l('kelompok_alat'); ?>
                     </a>
                 </div>
                 <div class="clearfix"></div>
@@ -70,13 +70,13 @@
     }
 
     $table_data = array_merge($table_data, [
-      _l('invoice_items_list_description'),
-      _l('invoice_item_long_description'),
-     // _l('invoice_items_list_rate'),
+      _l('jenis_pesawat_list_description'),
+      _l('jenis_pesawat_long_description'),
+     // _l('jenis_pesawat_list_rate'),
       //_l('tax_1'),
       //_l('tax_2'),
       //_l('unit'),
-      _l('item_group_name'), ]);
+      _l('kelompok_alat_name'), ]);
 /*
     $cf = get_custom_fields('items');
     foreach ($cf as $custom_field) {
@@ -94,7 +94,7 @@
         </div>
     </div>
 </div>
-<?php $this->load->view('admin/invoice_items/item'); ?>
+<?php $this->load->view('admin/jenis_pesawat/item'); ?>
 <div class="modal fade" id="groups" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -102,17 +102,17 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">
-                    <?php echo _l('item_groups'); ?>
+                    <?php echo _l('kelompok_alat'); ?>
                 </h4>
             </div>
             <div class="modal-body">
                 <?php if (has_permission('items', '', 'create')) { ?>
                 <div class="input-group">
-                    <input type="text" name="item_group_name" id="item_group_name" class="form-control"
-                        placeholder="<?php echo _l('item_group_name'); ?>">
+                    <input type="text" name="kelompok_alat_name" id="kelompok_alat_name" class="form-control"
+                        placeholder="<?php echo _l('kelompok_alat_name'); ?>">
                     <span class="input-group-btn">
                         <button class="btn btn-primary" type="button" id="new-item-group-insert">
-                            <?php echo _l('new_item_group'); ?>
+                            <?php echo _l('new_kelompok_alat'); ?>
                         </button>
                     </span>
                 </div>
@@ -124,11 +124,11 @@
                             <thead>
                                 <tr>
                                     <th><?php echo _l('id'); ?></th>
-                                    <th><?php echo _l('item_group_name'); ?></th>
+                                    <th><?php echo _l('kelompok_alat_name'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($items_groups as $group) { ?>
+                                <?php foreach ($kelompok_alat as $group) { ?>
                                 <tr class="row-has-options" data-group-row-id="<?php echo $group['id']; ?>">
                                     <td data-order="<?php echo $group['id']; ?>"><?php echo $group['id']; ?></td>
                                     <td data-order="<?php echo $group['name']; ?>">
@@ -149,7 +149,7 @@
                                             </a>
                                             <?php } ?>
                                             <?php if (has_permission('items', '', 'delete')) { ?>
-                                            | <a href="<?php echo admin_url('invoice_items/delete_group/' . $group['id']); ?>"
+                                            | <a href="<?php echo admin_url('jenis_pesawat/delete_group/' . $group['id']); ?>"
                                                 class="delete-item-group _delete text-danger">
                                                 <?php echo _l('delete'); ?>
                                             </a>
@@ -184,7 +184,7 @@ $(function() {
     if (typeof(id) !== 'undefined') {
         var $itemModal = $('#sales_item_modal');
         $('input[name="itemid"]').val(id);
-        requestGetJSON('invoice_items/get_item_by_id/' + id).done(function(response) {
+        requestGetJSON('jenis_pesawat/get_item_by_id/' + id).done(function(response) {
             $itemModal.find('input[name="description"]').val(response.description);
             $itemModal.find('textarea[name="long_description"]').val(response.long_description.replace(
                 /(<|<)br\s*\/*(>|>)/g, " "));
@@ -213,7 +213,7 @@ $(function() {
     }
     <?php } ?>
 
-    initDataTable('.table-invoice-items', admin_url + 'peralatan/invoice_items/table',
+    initDataTable('.table-invoice-items', admin_url + 'peralatan/jenis_pesawat/table',
         notSortableAndSearchableItemColumns, notSortableAndSearchableItemColumns, 'undefined', [1, 'asc']);
 
     if (get_url_param('groups_modal')) {
@@ -224,12 +224,12 @@ $(function() {
     }
 
     $('#new-item-group-insert').on('click', function() {
-        var group_name = $('#item_group_name').val();
+        var group_name = $('#kelompok_alat_name').val();
         if (group_name != '') {
-            $.post(admin_url + 'invoice_items/add_group', {
+            $.post(admin_url + 'jenis_pesawat/add_group', {
                 name: group_name
             }).done(function() {
-                window.location.href = admin_url + 'invoice_items?groups_modal=true';
+                window.location.href = admin_url + 'jenis_pesawat?groups_modal=true';
             });
         }
     });
@@ -248,10 +248,10 @@ $(function() {
         var group_id = tr.attr('data-group-row-id');
         name = tr.find('.group_edit input').val();
         if (name != '') {
-            $.post(admin_url + 'invoice_items/update_group/' + group_id, {
+            $.post(admin_url + 'peralatan/jenis_pesawat/update_group/' + group_id, {
                 name: name
             }).done(function() {
-                window.location.href = admin_url + 'invoice_items';
+                window.location.href = admin_url + 'peralatan/jenis_pesawat';
             });
         }
     });
@@ -277,7 +277,7 @@ function items_bulk_action(event) {
         data.ids = ids;
         $(event).addClass('disabled');
         setTimeout(function() {
-            $.post(admin_url + 'invoice_items/bulk_action', data).done(function() {
+            $.post(admin_url + 'jenis_pesawat/bulk_action', data).done(function() {
                 window.location.reload();
             }).fail(function(data) {
                 alert_float('danger', data.responseText);

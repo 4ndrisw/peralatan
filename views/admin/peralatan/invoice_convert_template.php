@@ -30,7 +30,7 @@
         <?php echo form_close(); ?>
     </div>
 </div>
-<?php $this->load->view('admin/invoice_items/item'); ?>
+<?php $this->load->view('admin/jenis_pesawat/item'); ?>
 <script>
     init_ajax_search('customer','#clientid.ajax-search');
     init_ajax_search('items','#item_select.ajax-search',undefined,admin_url+'items/search');

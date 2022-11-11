@@ -5,11 +5,11 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">
-                    <span class="edit-title"><?php echo _l('invoice_item_edit_heading'); ?></span>
-                    <span class="add-title"><?php echo _l('invoice_item_add_heading'); ?></span>
+                    <span class="edit-title"><?php echo _l('jenis_pesawat_edit_heading'); ?></span>
+                    <span class="add-title"><?php echo _l('jenis_pesawat_add_heading'); ?></span>
                 </h4>
             </div>
-            <?php echo form_open('admin/invoice_items/manage', ['id' => 'invoice_item_form']); ?>
+            <?php echo form_open('admin/peralatan/jenis_pesawat/manage', ['id' => 'jenis_pesawat_form']); ?>
             <?php echo form_hidden('itemid'); ?>
             <div class="modal-body">
                 <div class="row">
@@ -17,16 +17,12 @@
                         <div class="alert alert-warning affect-warning hide">
                             <?php echo _l('changing_items_affect_warning'); ?>
                         </div>
-                        <?php echo render_input('description', 'invoice_item_add_edit_description'); ?>
-                        <?php echo render_textarea('long_description', 'invoice_item_long_description'); ?>
+                        <?php echo render_input('description', 'jenis_pesawat_add_edit_description'); ?>
+                        <?php echo render_textarea('long_description', 'jenis_pesawat_long_description'); ?>
                         
                 <div class="clearfix mbot15"></div>
-                <?php echo render_input('unit', 'unit'); ?>
-                <div id="custom_fields_items">
-                    <?php echo render_custom_fields('items'); ?>
-                </div>
-                <?php echo render_select('group_id', $items_groups, ['id', 'name'], 'item_group'); ?>
-                <?php hooks()->do_action('before_invoice_item_modal_form_close'); ?>
+                <?php echo render_select('group_id', $kelompok_alat, ['id', 'name'], 'kelompok_alat'); ?>
+                <?php hooks()->do_action('before_jenis_pesawat_modal_form_close'); ?>
             </div>
         </div>
     </div>
@@ -53,7 +49,7 @@
      });
   }
 // Items add/edit
-function manage_invoice_items(form) {
+function manage_jenis_pesawat(form) {
     var data = $(form).serialize();
 
     var url = form.action;
@@ -133,7 +129,7 @@ function init_item_js() {
             $('.affect-warning').removeClass('hide');
             $('input[name="itemid"]').val(id);
 
-            requestGetJSON('invoice_items/get_item_by_id/' + id).done(function (response) {
+            requestGetJSON('peralatan/jenis_pesawat/get_item_by_id/' + id).done(function (response) {
                 $itemModal.find('input[name="description"]').val(response.description);
                 $itemModal.find('textarea[name="long_description"]').val(response.long_description.replace(/(<|<)br\s*\/*(>|>)/g, " "));
                 $itemModal.find('input[name="rate"]').val(response.rate);
@@ -169,11 +165,12 @@ function init_item_js() {
 }
 function validate_item_form(){
     // Set validation for invoice item form
-    appValidateForm($('#invoice_item_form'), {
+    appValidateForm($('#jenis_pesawat_form'), {
         description: 'required',
+        group_id: 'required',
         rate: {
             required: true,
         }
-    }, manage_invoice_items);
+    }, manage_jenis_pesawat);
 }
 </script>

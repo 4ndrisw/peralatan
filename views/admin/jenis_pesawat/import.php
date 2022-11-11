@@ -38,9 +38,13 @@
                                         class="btn btn-primary import btn-import-submit"><?php echo _l('import'); ?></button>
                                     <button type="button"
                                         class="btn btn-primary simulate btn-import-submit"><?php echo _l('simulate_import'); ?></button>
+                                    <span class="text-right">
+                                        <a class="btn btn-sm btn-default" href="./"><?= _l('cancel') ?></a>
+                                    </span>
                                 </div>
                                 <?php echo form_close(); ?>
                             </div>
+                            
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,7 @@
 <div class="panel-body mtop10">
    <div class="row">
       <div class="col-md-4">
-          <?php $this->load->view('admin/invoice_items/item_select'); ?>
+          <?php $this->load->view('admin/jenis_pesawat/item_select'); ?>
       </div>
       <div class="col-md-8 text-right show_quantity_as_wrapper">
          <div class="mtop10">

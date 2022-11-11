@@ -206,15 +206,15 @@ class Peralatan extends AdminController
 
         $this->load->model('taxes_model');
         $data['taxes'] = $this->taxes_model->get();
-        $this->load->model('invoice_items_model');
+        $this->load->model('jenis_pesawat_model');
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
+            $data['items'] = $this->jenis_pesawat_model->get_grouped();
         } else {
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
@@ -250,15 +250,15 @@ class Peralatan extends AdminController
         $title = _l('add_new', _l('peralatan_lowercase'));
         $this->load->model('taxes_model');
         $data['taxes'] = $this->taxes_model->get();
-        $this->load->model('invoice_items_model');
+        $this->load->model('jenis_pesawat_model');
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
+            $data['items'] = $this->jenis_pesawat_model->get_grouped();
         } else {
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
@@ -303,15 +303,15 @@ class Peralatan extends AdminController
 
         //$this->load->model('taxes_model');
         //$data['taxes'] = $this->taxes_model->get();
-        //$this->load->model('invoice_items_model');
+        //$this->load->model('jenis_pesawat_model');
         //$data['ajaxItems'] = false;
         //if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-        //    $data['items'] = $this->invoice_items_model->get_grouped();
+        //    $data['items'] = $this->jenis_pesawat_model->get_grouped();
         //} else {
         //    $data['items']     = [];
         //    $data['ajaxItems'] = true;
         //}
-        //$data['items_groups'] = $this->invoice_items_model->get_groups();
+        //$data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
@@ -566,15 +566,15 @@ class Peralatan extends AdminController
         $data['taxes']         = $this->taxes_model->get();
         $data['currencies']    = $this->currencies_model->get();
         $data['base_currency'] = $this->currencies_model->get_base_currency();
-        $this->load->model('invoice_items_model');
+        $this->load->model('jenis_pesawat_model');
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
+            $data['items'] = $this->jenis_pesawat_model->get_grouped();
         } else {
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['staff']          = $this->staff_model->get('', ['active' => 1]);
         $data['peralatan']       = $this->peralatan_model->get($id);
@@ -600,15 +600,15 @@ class Peralatan extends AdminController
         $data['taxes']         = $this->taxes_model->get();
         $data['currencies']    = $this->currencies_model->get();
         $data['base_currency'] = $this->currencies_model->get_base_currency();
-        $this->load->model('invoice_items_model');
+        $this->load->model('jenis_pesawat_model');
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->invoice_items_model->get_grouped();
+            $data['items'] = $this->jenis_pesawat_model->get_grouped();
         } else {
             $data['items']     = [];
             $data['ajaxItems'] = true;
         }
-        $data['items_groups'] = $this->invoice_items_model->get_groups();
+        $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['staff']     = $this->staff_model->get('', ['active' => 1]);
         $data['peralatan']  = $this->peralatan_model->get($id);
