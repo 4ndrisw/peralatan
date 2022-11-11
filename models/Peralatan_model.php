@@ -479,15 +479,14 @@ class Peralatan_model extends App_Model
             $this->db->where('status !=', 0);
         }
 
-        $this->db->select(['id', 'nama']);
+        $this->db->select(['id', 'description']);
         $this->db->from(db_prefix() . 'jenis_pesawat');
         //$this->db->join(db_prefix() . 'currencies', db_prefix() . 'currencies.id = ' . db_prefix() . 'peralatan.currency', 'left');
 
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'peralatan.id', $id);
             $jenis_pesawat = $this->db->get()->row();
-            $jenis_pesawat->category = $this->peralatan_model->get_category($peralatan->clientid);
-            
+            $jenis_pesawat->category = $this->peralatan_model->get_category($jenis_pesawat->group_id);
             return $jenis_pesawat;
         }
 

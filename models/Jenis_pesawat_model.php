@@ -276,6 +276,14 @@ class Jenis_pesawat_model extends App_Model
         return false;
     }
 
+    public function get_category($id)
+    {
+        $this->db->order_by('name', 'asc');
+        $this->db->where('id', $id);
+
+        return $this->db->get(db_prefix() . 'kelompok_alat')->result_array();
+    }
+
     public function get_groups()
     {
         $this->db->order_by('name', 'asc');

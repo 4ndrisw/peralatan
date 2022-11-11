@@ -251,6 +251,7 @@ class Peralatan extends AdminController
         $this->load->model('taxes_model');
         $data['taxes'] = $this->taxes_model->get();
         $this->load->model('jenis_pesawat_model');
+        $data['jenis_pesawat'] = $this->peralatan_model->get_jenis_pesawat();
         $data['ajaxItems'] = false;
         if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
             $data['items'] = $this->jenis_pesawat_model->get_grouped();

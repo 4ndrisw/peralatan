@@ -88,6 +88,7 @@
                   </div>
                 </div>
                 <div class="row">
+                  <div class="col-md-12">
                     <?php
                     $i = 0;
                     $selected = '';
@@ -99,9 +100,9 @@
                       }
                       $i++;
                     }
-                    echo render_select('jenis_pesawat_id', $jenis_pesawat, array('id', array('nama',)), 'peralatan_jenis_pesawat', $selected);
+                    echo render_select('jenis_pesawat_id', $jenis_pesawat, array('id', array('description',)), 'peralatan_jenis_pesawat', $selected);
                     ?>
-
+                  </div>
                 </div>
 
               </div>
@@ -231,11 +232,12 @@
       clientid: 'required',
       date: 'required',
       open_till: 'required',
+      jenis_pesawat_id: 'required',
+      lokasi: 'required',
       email: {
         email: true,
         required: true
       },
-      currency: 'required',
     });
   }
 </script>
