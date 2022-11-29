@@ -214,11 +214,7 @@ function format_peralatan_dropdown($status, $classes = '', $label = true)
     }
 
     if ($label == true) {
-        //$button = '<button type="button" class="btn btn-status btn-xs btn-'. $label_class .'">'. $status .'</button>';
-        //$button .= '<button type="button" class="btn btn-xs btn-'. $label_class .' dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
-        //$button .=            '<span class="sr-only">Toggle Dropdown</span>';
-        //$button .=          '</button>';
-        
+    
         $button =  '<button type="button" class="btn btn-xs btn-block btn-'. $label_class .' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
         $button .= $status;
         $button .= '</button>';
@@ -240,27 +236,6 @@ function format_peralatan_number($id)
     $format = get_option('peralatan_number_prefix') . str_pad($id, get_option('number_padding_prefixes'), '0', STR_PAD_LEFT);
 
     return hooks()->apply_filters('peralatan_number_format', $format, $id);
-}
-
-
-/**
- * Function that return peralatan item taxes based on passed item id
- * @param  mixed $itemid
- * @return array
- */
-function get_peralatan_item_taxes($itemid)
-{
-    $CI = &get_instance();
-    $CI->db->where('itemid', $itemid);
-    $CI->db->where('rel_type', 'peralatan');
-    $taxes = $CI->db->get(db_prefix() . 'item_tax')->result_array();
-    $i     = 0;
-    foreach ($taxes as $tax) {
-        $taxes[$i]['taxname'] = $tax['taxname'] . '|' . $tax['taxrate'];
-        $i++;
-    }
-
-    return $taxes;
 }
 
 
@@ -356,6 +331,7 @@ function user_can_view_peralatan($id, $staff_id = false)
 
     return false;
 }
+
 function parse_peralatan_content_merge_fields($peralatan)
 {
     $id = is_array($peralatan) ? $peralatan['id'] : $peralatan->id;
@@ -453,12 +429,7 @@ if (!function_exists('format_peralatan_info')) {
         $email      = $peralatan->email;
 
         if ($for == 'admin') {
-            $hrefAttrs = '';
-            if ($peralatan->rel_type == 'lead') {
-                $hrefAttrs = ' href="#" onclick="init_lead(' . $peralatan->clientid . '); return false;" data-toggle="tooltip" data-title="' . _l('lead') . '"';
-            } else {
-                $hrefAttrs = ' href="' . admin_url('clients/client/' . $peralatan->clientid) . '" data-toggle="tooltip" data-title="' . _l('client') . '"';
-            }
+            $hrefAttrs = ' href="' . admin_url('clients/client/' . $peralatan->clientid) . '" data-toggle="tooltip" data-title="' . _l('client') . '"';
             $peralatanTo = '<a' . $hrefAttrs . '>' . $peralatanTo . '</a>';
         }
 
@@ -592,3 +563,73 @@ function peralatan_status_color_pdf($status_id)
 
     return hooks()->apply_filters('peralatan_status_pdf_color', $statusColor, $status_id);
 }
+
+
+
+function peralatan_tab_peralatan($clients){
+
+ if(isset($clients)){ 
+    if($clients->is_perusahaan != 0){
+    ?>
+    <li role="presentation">
+        <a href="#peralatan" aria-controls="peralatan" role="tab" data-toggle="tab">
+        <?php echo _l('peralatan'); ?>
+        </a>
+    </li>
+<?php }
+
+    }
+}
+
+function peralatan_content_tab_peralatan($client){
+     $CI  = &get_instance();
+    if(!empty($client)){
+    if($client->is_perusahaan != 0){
+        $checked = '';
+    ?>
+    <div class="checkbox checkbox-info mbot20 no-mtop is_preffered" style="display: none;">
+        <?php
+         if (isset($client) && ($client->is_perusahaan == 1)) {
+            $checked =  ' checked';
+          }
+           ?>
+                     <input type="checkbox" name="is_preffered" <?php echo $checked;?> value="1" id="is_preffered">
+                     <label for="is_preffered"><?php echo _l('preffered_peralatan'); ?></label>
+                  </div>
+    <?php 
+        $CI->load->model(PERALATAN_MODULE_NAME.'/peralatan_model');
+        $data['statuses']              = $CI->peralatan_model->get_statuses();
+        $data['years']                 = $CI->peralatan_model->get_peralatan_years();
+        $data['client'] = $client;
+        $data['CI'] = $CI;
+        if(isset($client)){ 
+            $CI->load->view(PERALATAN_MODULE_NAME . '/admin/peralatan/manage_tab',$data); 
+             
+         }
+     }
+ }
+}
+
+function get_jenis_pesawat($jenis_pesawat_id = ''){
+    $CI  = &get_instance();
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
+    $CI->load->model('jenis_pesawat_model');
+    return $CI->jenis_pesawat_model->get($jenis_pesawat_id);
+}
+
+function get_kelompok_alat($kelompok_alat_id = ''){
+    $CI  = &get_instance();
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
+    $CI->load->model('jenis_pesawat_model');
+    return $CI->jenis_pesawat_model->get_category($kelompok_alat_id);
+}
+
+function get_peralatan($id = ''){
+    $CI  = &get_instance();
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/peralatan_model.php');
+    $CI->load->model('peralatan_model');
+
+    return $CI->peralatan_model->get($id, []);
+}
+
+

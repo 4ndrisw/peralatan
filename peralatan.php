@@ -15,6 +15,9 @@ define('PERALATAN_ATTACHMENTS_FOLDER', FCPATH . 'uploads/peralatan/');
 //hooks()->add_filter('before_peralatan_updated', '_format_data_peralatan_feature');
 //hooks()->add_filter('before_peralatan_added', '_format_data_peralatan_feature');
 
+//hooks()->add_action('after_custom_profile_tab_content', 'peralatan_content_tab_peralatan',10,1);
+//hooks()->add_action('after_customer_admins_tab', 'peralatan_tab_peralatan',10,1);
+
 hooks()->add_action('after_cron_run', 'peralatan_notification');
 hooks()->add_action('admin_init', 'peralatan_module_init_menu_items');
 hooks()->add_action('admin_init', 'peralatan_permissions');
@@ -169,6 +172,7 @@ function peralatan_module_init_menu_items()
             'name'       => _l('peralatan'),
             'url'        => 'peralatan',
             'permission' => 'peralatan',
+            'icon'     => 'fa-solid fa-screwdriver-wrench',
             'position'   => 57,
             ]);
 
@@ -176,13 +180,12 @@ function peralatan_module_init_menu_items()
         $CI->app_menu->add_sidebar_menu_item('peralatan', [
                 'slug'     => 'peralatan-tracking',
                 'name'     => _l('peralatan'),
-                'icon'     => 'fa fa-calendar',
+                'icon'     => 'fa-solid fa-screwdriver-wrench',
                 'href'     => admin_url('peralatan'),
                 'position' => 12,
         ]);
     }
 }
-
 function module_peralatan_action_links($actions)
 {
     $actions[] = '<a href="' . admin_url('settings?group=peralatan') . '">' . _l('settings') . '</a>';
@@ -193,10 +196,11 @@ function module_peralatan_action_links($actions)
 function peralatan_clients_area_menu_items()
 {
     // Show menu item only if client is logged in
-    if (is_client_logged_in()) {
+    if (is_client_logged_in() && has_contact_permission('peralatan')) {
         add_theme_menu_item('peralatan', [
                     'name'     => _l('peralatan'),
                     'href'     => site_url('peralatan/list'),
+                    'icon'     => 'fa-solid fa-screwdriver-wrench',
                     'position' => 15,
         ]);
     }

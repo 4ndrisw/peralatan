@@ -134,8 +134,8 @@ class Peralatan_model extends App_Model
             unset($data['peralatan_request_id']);
         }
 
-        $data['address'] = trim($data['address']);
-        $data['address'] = nl2br($data['address']);
+        $data['lokasi'] = trim($data['lokasi']);
+        $data['lokasi'] = nl2br($data['lokasi']);
 
         $data['datecreated'] = date('Y-m-d H:i:s');
         $data['addedfrom']   = get_staff_user_id();
@@ -164,7 +164,6 @@ class Peralatan_model extends App_Model
 
         $hook = hooks()->apply_filters('before_create_peralatan', [
             'data'  => $data,
-            'items' => $items,
         ]);
 
         $data  = $hook['data'];
@@ -196,7 +195,7 @@ class Peralatan_model extends App_Model
                     _maybe_insert_post_item_tax($itemid, $item, $insert_id, 'peralatan');
                 }
             }
-
+            
             $peralatan = $this->get($insert_id);
             if ($peralatan->assigned != 0) {
                 if ($peralatan->assigned != get_staff_user_id()) {
@@ -204,7 +203,7 @@ class Peralatan_model extends App_Model
                         'description'     => 'not_peralatan_assigned_to_you',
                         'touserid'        => $peralatan->assigned,
                         'fromuserid'      => get_staff_user_id(),
-                        'link'            => 'peralatan/list_peralatan/' . $insert_id,
+                        'link'            => 'peralatan/list_peralatan/' . $insert_id .'#' . $insert_id,
                         'additional_data' => serialize([
                             $peralatan->subject,
                         ]),
@@ -250,7 +249,7 @@ class Peralatan_model extends App_Model
 
         $data['allow_comments'] = isset($data['allow_comments']) ? 1 : 0;
 
-        $current_peralatan = $this->get($id);
+        $origin = $this->get($id);
 
         $save_and_send = isset($data['save_and_send']);
 
@@ -266,132 +265,48 @@ class Peralatan_model extends App_Model
         }
         */
 
-        if (isset($data['custom_fields'])) {
-            $custom_fields = $data['custom_fields'];
-            if (handle_custom_fields_post($id, $custom_fields)) {
-                $affectedRows++;
-            }
-            unset($data['custom_fields']);
-        }
-
-        $items = [];
-        if (isset($data['items'])) {
-            $items = $data['items'];
-            unset($data['items']);
-        }
-
-        $newitems = [];
-        if (isset($data['newitems'])) {
-            $newitems = $data['newitems'];
-            unset($data['newitems']);
-        }
-
-        if (isset($data['tags'])) {
-            if (handle_tags_save($data['tags'], $id, 'peralatan')) {
-                $affectedRows++;
-            }
-        }
-
-        $data['address'] = trim($data['address']);
-        $data['address'] = nl2br($data['address']);
+        //$data['date'] = _d($data['date']);
+        //$data['open_till'] = _d($data['open_till']);
+        
+        $data['lokasi'] = trim($data['lokasi']);
+        $data['lokasi'] = nl2br($data['lokasi']);
 
         $hook = hooks()->apply_filters('before_peralatan_updated', [
             'data'          => $data,
-            'items'         => $items,
-            'newitems'      => $newitems,
             'removed_items' => isset($data['removed_items']) ? $data['removed_items'] : [],
         ], $id);
 
-        $data                  = $hook['data'];
-        $data['removed_items'] = $hook['removed_items'];
-        $newitems              = $hook['newitems'];
-        $items                 = $hook['items'];
-
-        // Delete items checked to be removed from database
-        foreach ($data['removed_items'] as $remove_item_id) {
-            if (handle_removed_sales_item_post($remove_item_id, 'peralatan')) {
-                $affectedRows++;
-            }
-        }
-
-        unset($data['removed_items']);
-        unset($data['tags']);
-        unset($data['item_select']);
         unset($data['description']);
         unset($data['long_description']);
-        unset($data['quantity']);
-        unset($data['unit']);
-        unset($data['rate']);
-        unset($data['taxname']);
-
-
-
 
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'peralatan', $data);
         if ($this->db->affected_rows() > 0) {
+
+            $peralatan = $this->get($id);            
+            if ($origin->subject != $peralatan->subject) {
+                $this->log_peralatan_activity($origin->id, 'peralatan_activity_subject_changed', false, serialize([
+                    $origin->subject,
+                    $peralatan->subject,
+                ]));
+            }
+
             $affectedRows++;
-            $peralatan_now = $this->get($id);
-            if ($current_peralatan->assigned != $peralatan_now->assigned) {
-                if ($peralatan_now->assigned != get_staff_user_id()) {
+            if ($origin->assigned != $peralatan->assigned) {
+                //if ($peralatan->assigned != get_staff_user_id()) {
                     $notified = add_notification([
                         'description'     => 'not_peralatan_assigned_to_you',
-                        'touserid'        => $peralatan_now->assigned,
+                        'touserid'        => $peralatan->assigned,
                         'fromuserid'      => get_staff_user_id(),
                         'link'            => 'peralatan/list_peralatan/' . $id,
                         'additional_data' => serialize([
-                            $peralatan_now->subject,
+                            $peralatan->subject,
                         ]),
                     ]);
                     if ($notified) {
-                        pusher_trigger_notification([$peralatan_now->assigned]);
+                        pusher_trigger_notification([$peralatan->assigned,get_staff_user_id()]);
                     }
-                }
-            }
-        }
-
-        foreach ($items as $key => $item) {
-            if (update_sales_item_post($item['itemid'], $item)) {
-                $affectedRows++;
-            }
-
-            if (isset($item['custom_fields'])) {
-                if (handle_custom_fields_post($item['itemid'], $item['custom_fields'])) {
-                    $affectedRows++;
-                }
-            }
-
-            if (!isset($item['taxname']) || (isset($item['taxname']) && count($item['taxname']) == 0)) {
-                if (delete_taxes_from_item($item['itemid'], 'peralatan')) {
-                    $affectedRows++;
-                }
-            } else {
-                $item_taxes        = get_peralatan_item_taxes($item['itemid']);
-                $_item_taxes_names = [];
-                foreach ($item_taxes as $_item_tax) {
-                    array_push($_item_taxes_names, $_item_tax['taxname']);
-                }
-                $i = 0;
-                foreach ($_item_taxes_names as $_item_tax) {
-                    if (!in_array($_item_tax, $item['taxname'])) {
-                        $this->db->where('id', $item_taxes[$i]['id'])
-                        ->delete(db_prefix() . 'item_tax');
-                        if ($this->db->affected_rows() > 0) {
-                            $affectedRows++;
-                        }
-                    }
-                    $i++;
-                }
-                if (_maybe_insert_post_item_tax($item['itemid'], $item, $id, 'peralatan')) {
-                    $affectedRows++;
-                }
-            }
-        }
-
-        foreach ($newitems as $key => $item) {
-            if ($new_item_added = add_new_sales_item_post($item, $id, 'peralatan')) {
-                _maybe_insert_post_item_tax($new_item_added, $item, $id, 'peralatan');
-                $affectedRows++;
+                //}
             }
         }
 
@@ -426,9 +341,10 @@ class Peralatan_model extends App_Model
             $this->db->where('status !=', 0);
         }
 
-        $this->db->select('*,' . db_prefix() . 'currencies.id as currencyid, ' . db_prefix() . 'peralatan.id as id, ' . db_prefix() . 'currencies.name as currency_name');
+        //$this->db->select('*,' . db_prefix() . 'currencies.id as currencyid, ' . db_prefix() . 'peralatan.id as id, ' . db_prefix() . 'currencies.name as currency_name');
+        $this->db->select('*,' . db_prefix() . 'peralatan.id');
         $this->db->from(db_prefix() . 'peralatan');
-        $this->db->join(db_prefix() . 'currencies', db_prefix() . 'currencies.id = ' . db_prefix() . 'peralatan.currency', 'left');
+ 
 
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'peralatan.id', $id);
@@ -462,7 +378,7 @@ class Peralatan_model extends App_Model
             return $peralatan;
         }
 
-        return $this->db->get()->result_array();
+        return $this->db->get()->result();
     }
 
 
@@ -481,7 +397,6 @@ class Peralatan_model extends App_Model
 
         $this->db->select(['id', 'description']);
         $this->db->from(db_prefix() . 'jenis_pesawat');
-        //$this->db->join(db_prefix() . 'currencies', db_prefix() . 'currencies.id = ' . db_prefix() . 'peralatan.currency', 'left');
 
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'peralatan.id', $id);
@@ -744,56 +659,9 @@ class Peralatan_model extends App_Model
             $insert_data['open_till'] = _d(date('Y-m-d', strtotime('+' . get_option('peralatan_due_after') . ' DAY', strtotime(date('Y-m-d')))));
         }
 
-        $insert_data['newitems'] = [];
-        $custom_fields_items     = get_custom_fields('items');
-        $key                     = 1;
-        foreach ($peralatan->items as $item) {
-            $insert_data['newitems'][$key]['description']      = $item['description'];
-            $insert_data['newitems'][$key]['long_description'] = clear_textarea_breaks($item['long_description']);
-            $insert_data['newitems'][$key]['qty']              = $item['qty'];
-            $insert_data['newitems'][$key]['unit']             = $item['unit'];
-            $insert_data['newitems'][$key]['taxname']          = [];
-            $taxes                                             = get_peralatan_item_taxes($item['id']);
-            foreach ($taxes as $tax) {
-                // tax name is in format TAX1|10.00
-                array_push($insert_data['newitems'][$key]['taxname'], $tax['taxname']);
-            }
-            $insert_data['newitems'][$key]['rate']  = $item['rate'];
-            $insert_data['newitems'][$key]['order'] = $item['item_order'];
-            foreach ($custom_fields_items as $cf) {
-                $insert_data['newitems'][$key]['custom_fields']['items'][$cf['id']] = get_custom_field_value($item['id'], $cf['id'], 'items', false);
-
-                if (!defined('COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST')) {
-                    define('COPY_CUSTOM_FIELDS_LIKE_HANDLE_POST', true);
-                }
-            }
-            $key++;
-        }
-
         $id = $this->add($insert_data);
-
-        if ($id) {
-            $custom_fields = get_custom_fields('peralatan');
-            foreach ($custom_fields as $field) {
-                $value = get_custom_field_value($peralatan->id, $field['id'], 'peralatan', false);
-                if ($value == '') {
-                    continue;
-                }
-                $this->db->insert(db_prefix() . 'customfieldsvalues', [
-                    'relid'   => $id,
-                    'fieldid' => $field['id'],
-                    'fieldto' => 'peralatan',
-                    'value'   => $value,
-                ]);
-            }
-
-            $tags = get_tags_in($peralatan->id, 'peralatan');
-            handle_tags_save($tags, $id, 'peralatan');
-
             log_activity('Copied Peralatan ' . format_peralatan_number($peralatan->id));
-
             return $id;
-        }
 
         return false;
     }
@@ -1003,7 +871,7 @@ class Peralatan_model extends App_Model
             }
         }
         $data->company = $_data->company;
-        $data->address = clear_textarea_breaks($_data->address);
+        $data->lokasi = clear_textarea_breaks($_data->lokasi);
         $data->zip     = $_data->zip;
         $data->country = $_data->country;
         $data->state   = $_data->state;
@@ -1112,5 +980,47 @@ class Peralatan_model extends App_Model
         $this->db->where(db_prefix() . 'peralatan.clientid =', $client->userid);
 
         return $this->db->get(db_prefix() . 'peralatan')->result_array();
+    }
+
+    /**
+     * All peralatan activity
+     * @param mixed $id peralatanid
+     * @return array
+     */
+    public function get_peralatan_activity($id)
+    {
+        $this->db->where('rel_id', $id);
+        $this->db->where('rel_type', 'peralatan');
+        $this->db->order_by('date', 'desc');
+
+        return $this->db->get(db_prefix() . 'peralatan_activity')->result_array();
+    }
+
+    /**
+     * Log peralatan activity to database
+     * @param mixed $id peralatanid
+     * @param string $description activity description
+     */
+    public function log_peralatan_activity($id, $description = '', $client = false, $additional_data = '')
+    {
+        $staffid   = get_staff_user_id();
+        $full_name = get_staff_full_name(get_staff_user_id());
+        if (DEFINED('CRON')) {
+            $staffid   = '[CRON]';
+            $full_name = '[CRON]';
+        } elseif ($client == true) {
+            $staffid   = null;
+            $full_name = '';
+        }
+
+        $this->db->insert(db_prefix() . 'peralatan_activity', [
+            'description'     => $description,
+            'date'            => date('Y-m-d H:i:s'),
+            'rel_id'          => $id,
+            'rel_type'        => 'peralatan',
+            'staffid'         => $staffid,
+            'full_name'       => $full_name,
+            'additional_data' => $additional_data,
+        ]);
     }
 }

@@ -1,10 +1,14 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
-<div id="wrapper">
-   <div class="content">
+
+<div role="tabpanel" class="tab-pane" id="peralatan">
+         
+            <?php if (has_permission('items', '', 'create') || has_permission('items', '', 'edit')) { ?>
+            <a href="#" class="btn btn-info mbot30" data-toggle="modal" data-target="#sales_item_modals"><?php echo _l('new_invoice_item'); ?></a>
+            <?php } ?>
+
       <div class="row">
          <div class="_filters _hidden_inputs">
             <?php
+            
                foreach($statuses as $_status){
                 $val = '';
                 if($_status == $this->input->get('status')){
@@ -30,19 +34,12 @@
                   $this->load->view('admin/peralatan/peralatan_top_stats');
                   } ?>
 
+
                   <?php if(has_permission('peralatan','','create')){ ?>
-                     <a href="<?php echo admin_url('peralatan/add_peralatan'); ?>" class="btn btn-info pull-left display-block">
-                        <?php echo _l('new_peralatan'); ?>
-                     </a>
+                  <a href="<?php echo admin_url('peralatan/add_peralatan'); ?>" class="btn btn-info pull-left display-block">
+                  <?php echo _l('new_peralatan'); ?>
+                  </a>
                   <?php } ?>
-
-                  <?php if(has_permission('peralatan','','view')){ ?>
-                     <a href="<?php echo admin_url('peralatan/jenis_pesawat'); ?>" class="btn btn-warning mleft5 pull-left display-block">
-                        <?php echo _l('jenis_pesawat'); ?>
-                     </a>
-                  <?php } ?>
-
-
                   <a href="<?php echo admin_url('peralatan/pipeline/'.$switch_pipeline); ?>" class="btn btn-default mleft5 pull-left hidden-xs"><?php echo _l('switch_to_pipeline'); ?></a>
                   <div class="display-block text-right">
                      
@@ -138,9 +135,14 @@
             </div>
          </div>
       </div>
-   </div>
-</div>
-<?php $this->load->view('admin/includes/modals/sales_attach_file'); ?>
+
+         </div>
+         <?php //$CI->load->view(MODULE_PERUSAHAAN . '/admin/perusahaan/items/items'); ?>
+         <div class="checkbox checkbox-primary no-mtop checkbox-inline task-add-edit-public" style=" display:none;">
+                     <input type="checkbox" id="is_perusahaan" name="is_perusahaan" checked>
+                     <label for="is_perusahaan"><?= _l('is_perusahaan') ?></label>
+          </div>
+
 <script>var hidden_columns = [4,5,6,7];</script>
 <?php init_tail(); ?>
 <div id="convert_helper"></div>
@@ -154,6 +156,4 @@
      initDataTable('.table-peralatan', admin_url+'peralatan/table', ['undefined'], ['undefined'], Peralatan_ServerParams, [7, 'desc']);
      init_peralatan();
    });
-</script>
-</body>
-</html>
+</script>          

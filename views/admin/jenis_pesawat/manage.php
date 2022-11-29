@@ -149,7 +149,7 @@
                                             </a>
                                             <?php } ?>
                                             <?php if (has_permission('items', '', 'delete')) { ?>
-                                            | <a href="<?php echo admin_url('jenis_pesawat/delete_group/' . $group['id']); ?>"
+                                            | <a href="<?php echo admin_url('peralatan/jenis_pesawat/delete_group/' . $group['id']); ?>"
                                                 class="delete-item-group _delete text-danger">
                                                 <?php echo _l('delete'); ?>
                                             </a>
@@ -226,10 +226,10 @@ $(function() {
     $('#new-item-group-insert').on('click', function() {
         var group_name = $('#kelompok_alat_name').val();
         if (group_name != '') {
-            $.post(admin_url + 'jenis_pesawat/add_group', {
+            $.post(admin_url + 'peralatan/jenis_pesawat/add_group', {
                 name: group_name
             }).done(function() {
-                window.location.href = admin_url + 'jenis_pesawat?groups_modal=true';
+                window.location.href = admin_url + 'peralatan/jenis_pesawat?groups_modal=true';
             });
         }
     });

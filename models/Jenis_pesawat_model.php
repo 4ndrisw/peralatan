@@ -66,29 +66,13 @@ class Jenis_pesawat_model extends App_Model
      */
     public function get($id = '')
     {
-        $columns             = $this->db->list_fields(db_prefix() . 'jenis_pesawat');
-        $rateCurrencyColumns = '';
-        foreach ($columns as $column) {
-            if (strpos($column, 'rate_currency_') !== false) {
-                $rateCurrencyColumns .= $column . ',';
-            }
-        }
-        $this->db->select($rateCurrencyColumns . '' . db_prefix() . 'jenis_pesawat.id as itemid,rate,
-            t1.taxrate as taxrate,t1.id as taxid,t1.name as taxname,
-            t2.taxrate as taxrate_2,t2.id as taxid_2,t2.name as taxname_2,
-            description,long_description,group_id,' . db_prefix() . 'kelompok_alat.name as group_name,unit');
         $this->db->from(db_prefix() . 'jenis_pesawat');
-        $this->db->join('' . db_prefix() . 'taxes t1', 't1.id = ' . db_prefix() . 'jenis_pesawat.tax', 'left');
-        $this->db->join('' . db_prefix() . 'taxes t2', 't2.id = ' . db_prefix() . 'jenis_pesawat.tax2', 'left');
-        $this->db->join(db_prefix() . 'kelompok_alat', '' . db_prefix() . 'kelompok_alat.id = ' . db_prefix() . 'jenis_pesawat.group_id', 'left');
-        $this->db->order_by('description', 'asc');
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'jenis_pesawat.id', $id);
-
             return $this->db->get()->row();
         }
 
-        return $this->db->get()->result_array();
+        return $this->db->get()->result();
     }
 
     public function get_grouped()
@@ -276,11 +260,12 @@ class Jenis_pesawat_model extends App_Model
         return false;
     }
 
-    public function get_category($id)
+    public function get_category($id='')
     {
         $this->db->order_by('name', 'asc');
-        $this->db->where('id', $id);
-
+        if($id){
+            $this->db->where('id', $id);
+        }
         return $this->db->get(db_prefix() . 'kelompok_alat')->result_array();
     }
 

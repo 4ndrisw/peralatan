@@ -35,7 +35,7 @@
 </div>
 </div>
 <script>
-    // Maybe in modal? Eq convert to invoice or convert proposal to estimate/invoice
+    // Maybe in modal? Eq convert to invoice or convert peralatan to estimate/invoice
     if(typeof(jQuery) != 'undefined'){
         init_item_js();
     } else {

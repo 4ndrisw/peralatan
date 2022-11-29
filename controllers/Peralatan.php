@@ -11,6 +11,7 @@ class Peralatan extends AdminController
     {
         parent::__construct();
         $this->load->model('peralatan_model');
+        $this->load->model('jenis_pesawat_model');
         $this->load->model('currencies_model');
         include_once(module_libs_path('peralatan') . 'mails/Peralatan_mail_template.php');
         //$this->load->library('module_name/library_name');
@@ -56,7 +57,6 @@ class Peralatan extends AdminController
             if ($this->input->get('status') && $isPipeline) {
                 $this->pipeline(0, true);
             }
-
             $data['peralatan_id']           = $peralatan_id;
             $data['switch_pipeline']       = true;
             $data['title']                 = _l('peralatan');
@@ -248,23 +248,16 @@ class Peralatan extends AdminController
         }
 
         $title = _l('add_new', _l('peralatan_lowercase'));
-        $this->load->model('taxes_model');
-        $data['taxes'] = $this->taxes_model->get();
+        //$this->load->model('taxes_model');
+        //$data['taxes'] = $this->taxes_model->get();
         $this->load->model('jenis_pesawat_model');
         $data['jenis_pesawat'] = $this->peralatan_model->get_jenis_pesawat();
-        $data['ajaxItems'] = false;
-        if (total_rows(db_prefix() . 'items') <= ajax_on_total_items()) {
-            $data['items'] = $this->jenis_pesawat_model->get_grouped();
-        } else {
-            $data['items']     = [];
-            $data['ajaxItems'] = true;
-        }
+
+
         $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
-        $data['currencies']    = $this->currencies_model->get();
-        $data['base_currency'] = $this->currencies_model->get_base_currency();
 
         $data['title'] = $title;
         $this->load->view('admin/peralatan/add_peralatan', $data);
@@ -278,6 +271,10 @@ class Peralatan extends AdminController
             if (!has_permission('peralatan', '', 'edit')) {
                 access_denied('peralatan');
             }
+            $jenis_pesawat = $this->jenis_pesawat_model->get($peralatan_data['jenis_pesawat_id']);
+            $peralatan_data['jenis_pesawat_id'] = $jenis_pesawat->id;
+            $peralatan_data['jenis_pesawat'] = $jenis_pesawat->description;
+            $peralatan_data['kelompok_alat_id'] = $jenis_pesawat->group_id;
 
             $success = $this->peralatan_model->update($peralatan_data, $id);
             if ($success) {
@@ -299,7 +296,7 @@ class Peralatan extends AdminController
         $data['peralatan']    = $data['peralatan'];
         $data['is_peralatan'] = true;
         $title               = _l('edit', _l('peralatan_lowercase'));
-        
+
         $data['jenis_pesawat'] = $this->peralatan_model->get_jenis_pesawat();
 
         //$this->load->model('taxes_model');
@@ -312,8 +309,9 @@ class Peralatan extends AdminController
         //    $data['items']     = [];
         //    $data['ajaxItems'] = true;
         //}
-        //$data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
+
+        //$data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
         $data['currencies']    = $this->currencies_model->get();
@@ -436,6 +434,7 @@ class Peralatan extends AdminController
 
         $merge_fields = array_merge($merge_fields, $this->app_merge_fields->get_flat('peralatan', 'other', '{email_signature}'));
 
+        $data['activity']          = $this->peralatan_model->get_peralatan_activity($id);
         $data['peralatan_statuses']     = $this->peralatan_model->get_statuses();
         $data['members']               = $this->staff_model->get('', ['active' => 1]);
         $data['peralatan_merge_fields'] = $merge_fields;
@@ -480,7 +479,7 @@ class Peralatan extends AdminController
             $this->load->view('admin/peralatan/peralatan_total_template', $data);
         }
     }
-    
+
     public function add_note($clientid)
     {
         if ($this->input->post() && user_can_view_peralatan($clientid)) {

@@ -109,10 +109,10 @@
                  if ($item['qty'] == '' || $item['qty'] == 0) {
                    $item['qty'] = 1;
                  }
-                 if(!isset($is_proposal)){
+                 if(!isset($is_peralatan)){
                   $peralatan_item_taxes = get_peralatan_item_taxes($item['id']);
                 } else {
-                  $peralatan_item_taxes = get_proposal_item_taxes($item['id']);
+                  $peralatan_item_taxes = get_peralatan_item_taxes($item['id']);
                 }
                 if ($item['id'] == 0) {
                  $peralatan_item_taxes = $item['taxname'];
@@ -136,7 +136,7 @@
                $table_row .= '<input type="text" placeholder="'.$unit_placeholder.'" name="'.$items_indicator.'['.$i.'][unit]" class="form-control input-transparent text-right" value="'.$item['unit'].'">';
                $table_row .= '</td>';
                $table_row .= '<td class="rate"><input type="number" data-toggle="tooltip" title="' . _l('numbers_not_formatted_while_editing') . '" onblur="calculate_total();" onchange="calculate_total();" name="' . $items_indicator . '[' . $i . '][rate]" value="' . $item['rate'] . '" class="form-control"></td>';
-               $table_row .= '<td class="taxrate">' . $this->misc_model->get_taxes_dropdown_template('' . $items_indicator . '[' . $i . '][taxname][]', $peralatan_item_taxes, (isset($is_proposal) ? 'proposal' : 'peralatan'), $item['id'], true, $manual) . '</td>';
+               $table_row .= '<td class="taxrate">' . $this->misc_model->get_taxes_dropdown_template('' . $items_indicator . '[' . $i . '][taxname][]', $peralatan_item_taxes, (isset($is_peralatan) ? 'peralatan' : 'peralatan'), $item['id'], true, $manual) . '</td>';
                $table_row .= '<td class="amount" align="right">' . $amount . '</td>';
                $table_row .= '<td><a href="#" class="btn btn-danger pull-left" onclick="delete_item(this,' . $item['id'] . '); return false;"><i class="fa fa-times"></i></a></td>';
                $table_row .= '</tr>';

@@ -13,6 +13,11 @@
                   <?php echo _l('peralatan'); ?>
                   </a>
                </li>
+               <li role="presentation">
+                  <a href="#tab_activity" aria-controls="tab_activity" role="tab" data-toggle="tab">
+                  <?php echo _l('peralatan_view_activity_tooltip'); ?>
+                  </a>
+               </li>
                <?php if(isset($peralatan)){ ?>
                <li role="presentation">
                   <a href="#tab_comments" onclick="get_peralatan_comments(); return false;" aria-controls="tab_comments" role="tab" data-toggle="tab">
@@ -103,10 +108,10 @@
          </div>
          <div class="col-md-9 text-right _buttons peralatan_buttons">
             <?php if(has_permission('peralatan','','edit')){ ?>
-            <a href="<?php echo admin_url('peralatan/edit_peralatan/'.$peralatan->id); ?>" data-placement="left" data-toggle="tooltip" title="<?php echo _l('peralatan_edit'); ?>" class="btn btn-default btn-with-tooltip" data-placement="bottom"><i class="fa fa-pencil-square-o"></i></a>
+            <a href="<?php echo admin_url('peralatan/edit_peralatan/'.$peralatan->id); ?>" data-placement="left" data-toggle="tooltip" title="<?php echo _l('peralatan_edit'); ?>" class="btn btn-default btn-with-tooltip" data-placement="bottom"><i class="fa-regular fa-pen-to-square"></i></a>
             <?php } ?>
             <div class="btn-group">
-               <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-file-pdf-o"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
+               <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-regular fa-file-pdf"></i><?php if(is_mobile()){echo ' PDF';} ?> <span class="caret"></span></a>
                <ul class="dropdown-menu dropdown-menu-right">
                   <li class="hidden-xs"><a href="<?php echo site_url('peralatan/pdf/'.$peralatan->id.'?output_type=I'); ?>"><?php echo _l('view_pdf'); ?></a></li>
                   <li class="hidden-xs"><a href="<?php echo site_url('peralatan/pdf/'.$peralatan->id.'?output_type=I'); ?>" target="_blank"><?php echo _l('view_pdf_in_new_window'); ?></a></li>
@@ -197,7 +202,7 @@
             <?php } ?>
             <?php } else {
                if($peralatan->id != NULL){
-                echo '<a href="'.admin_url('peralatan/list_peralatan/'.$peralatan->id).'" class="btn btn-info">'.format_peralatan_number($peralatan->id).'</a>';
+                echo '<a href="'.admin_url('peralatan/list_peralatan/'.$peralatan->id . '#'.$peralatan->id).'" class="btn btn-info">'.format_peralatan_number($peralatan->id).'</a>';
                } else {
                 echo '<a href="'.admin_url('invoices/list_invoices/'.$peralatan->invoice_id).'" class="btn btn-info">'.format_invoice_number($peralatan->invoice_id).'</a>';
                }
@@ -231,13 +236,13 @@
                                echo '<i class="fa fa-tag" aria-hidden="true" data-toggle="tooltip" data-title="'.html_escape(implode(', ',$tags)).'"></i>';
                               }
                               ?>
-                           <a href="<?php echo admin_url('peralatan/peralatan/'.$peralatan->id); ?>">
+                           <a href="<?php echo admin_url('peralatan/list_peralatan/'.$peralatan->id . '#'.$peralatan->id); ?>">
                            <span id="peralatan-number">
                            <?php echo format_peralatan_number($peralatan->id); ?>
                            </span>
                            </a>
                         </h4>
-                        <h5 class="bold mbot15 font-medium"><a href="<?php echo admin_url('peralatan/peralatan/'.$peralatan->id); ?>"><?php echo $peralatan->subject; ?></a></h5>
+                        <h5 class="bold mbot15 font-medium"><a href="<?php echo admin_url('peralatan/list_peralatan/'.$peralatan->id . '#'.$peralatan->id); ?>"><?php echo $peralatan->subject; ?></a></h5>
                         <address>
                            <?php echo format_organization_info(); ?>
                         </address>
@@ -254,7 +259,7 @@
                      if(count($peralatan->attachments) > 0){ ?>
                   <p class="bold"><?php echo _l('peralatan_files'); ?></p>
                   <?php foreach($peralatan->attachments as $attachment){
-                     $attachment_url = site_url('download/file/sales_attachment/'.$attachment['attachment_key']);
+                     $attachment_url = site_url('download/file/peralatan/'.$attachment['attachment_key']);
                      if(!empty($attachment['external'])){
                         $attachment_url = $attachment['external_link'];
                      }
@@ -294,7 +299,7 @@
                         <p class="bold text-muted"><?php echo _l('peralatan_files'); ?></p>
                      </div>
                      <?php foreach($peralatan->attachments as $attachment){
-                        $attachment_url = site_url('download/file/sales_attachment/'.$attachment['attachment_key']);
+                        $attachment_url = site_url('download/file/peralatan/'.$attachment['attachment_key']);
                         if(!empty($attachment['external'])){
                           $attachment_url = $attachment['external_link'];
                         }
@@ -348,6 +353,70 @@
                         </div>
                         <?php } ?>
                </div>
+
+               <div role="tabpanel" class="tab-pane" id="tab_activity">
+                  <div class="row">
+                     <div class="col-md-12">
+                        <div class="activity-feed">
+                           <?php foreach($activity as $activity){
+                              $_custom_data = false;
+                              ?>
+                           <div class="feed-item" data-sale-activity-id="<?php echo $activity['id']; ?>">
+                              <div class="date">
+                                 <span class="text-has-action" data-toggle="tooltip" data-title="<?php echo _dt($activity['date']); ?>">
+                                 <?php echo time_ago($activity['date']); ?>
+                                 </span>
+                              </div>
+                              <div class="text">
+                                 <?php if(is_numeric($activity['staffid']) && $activity['staffid'] != 0){ ?>
+                                 <a href="<?php echo admin_url('profile/'.$activity["staffid"]); ?>">
+                                 <?php echo staff_profile_image($activity['staffid'],array('staff-profile-xs-image pull-left mright5'));
+                                    ?>
+                                 </a>
+                                 <?php } ?>
+                                 <?php
+                                    $additional_data = '';
+                                    if(!empty($activity['additional_data'])){
+                                     $additional_data = unserialize($activity['additional_data']);
+
+                                     $i = 0;
+                                     foreach($additional_data as $data){
+                                       if(strpos($data,'<original_status>') !== false){
+                                         $original_status = get_string_between($data, '<original_status>', '</original_status>');
+                                         $additional_data[$i] = format_peralatan_status($original_status,'',false);
+                                       } else if(strpos($data,'<new_status>') !== false){
+                                         $new_status = get_string_between($data, '<new_status>', '</new_status>');
+                                         $additional_data[$i] = format_peralatan_status($new_status,'',false);
+                                       } else if(strpos($data,'<status>') !== false){
+                                         $status = get_string_between($data, '<status>', '</status>');
+                                         $additional_data[$i] = format_peralatan_status($status,'',false);
+                                       } else if(strpos($data,'<custom_data>') !== false){
+                                         $_custom_data = get_string_between($data, '<custom_data>', '</custom_data>');
+                                         unset($additional_data[$i]);
+                                       }
+                                       $i++;
+                                     }
+                                    }
+                                    $_formatted_activity = _l($activity['description'],$additional_data);
+                                    if($_custom_data !== false){
+                                    $_formatted_activity .= ' - ' .$_custom_data;
+                                    }
+                                    if(!empty($activity['full_name'])){
+                                    $_formatted_activity = $activity['full_name'] . ' - ' . $_formatted_activity;
+                                    }
+                                    echo $_formatted_activity;
+                                    if(is_admin()){
+                                    echo '<a href="#" class="pull-right text-danger" onclick="delete_sale_activity('.$activity['id'].'); return false;"><i class="fa fa-remove"></i></a>';
+                                    }
+                                    ?>
+                              </div>
+                           </div>
+                           <?php } ?>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
                <div role="tabpanel" class="tab-pane" id="tab_comments">
                   <div class="row peralatan-comments mtop15">
                      <div class="col-md-12">
@@ -419,7 +488,7 @@
    </div>
 </div>
 <div id="modal-wrapper"></div>
-<?php // $this->load->view('admin/peralatan/send_peralatan_to_email_template'); ?>
+<?php //$this->load->view('admin/peralatan/send_peralatan_to_email_template'); ?>
 <script>
    init_btn_with_tooltips();
    init_datepicker();

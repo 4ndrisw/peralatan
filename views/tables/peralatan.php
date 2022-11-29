@@ -7,13 +7,14 @@ $baseCurrency = get_base_currency();
 $aColumns = [
     db_prefix() . 'peralatan.id',
     'subject',
-    'peralatan_to',
+    'clientid',
     'nomor_seri',
     'nomor_unit',
     'open_till',
-    'datecreated',
-    'status',
+    db_prefix() . 'peralatan.datecreated',
+    db_prefix() . 'peralatan.status',
 ];
+
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'peralatan';
@@ -21,14 +22,8 @@ $sTable       = db_prefix() . 'peralatan';
 $where  = [];
 $filter = [];
 
-if ($this->ci->input->post('leads_related')) {
-    array_push($filter, 'OR rel_type="lead"');
-}
-if ($this->ci->input->post('customers_related')) {
-    array_push($filter, 'OR rel_type="customer"');
-}
 if ($this->ci->input->post('expired')) {
-    array_push($filter, 'OR open_till IS NOT NULL AND open_till <"' . date('Y-m-d') . '" AND status NOT IN(2,3)');
+    array_push($filter, 'OR open_till IS NOT NULL AND open_till <"' . date('Y-m-d') . '" AND '.db_prefix() . 'peralatan.status NOT IN(2,3)');
 }
 
 $statuses  = $this->ci->peralatan_model->get_statuses();
@@ -73,11 +68,17 @@ if (!has_permission('peralatan', '', 'view')) {
     array_push($where, 'AND ' . get_peralatan_sql_where_staff(get_staff_user_id()));
 }
 
-$join          = [];
+$join = [
+    'JOIN '.db_prefix().'clients ON '.db_prefix().'clients.userid='.db_prefix().'peralatan.clientid',
+];
+
+$additionalColumns = hooks()->apply_filters('schedules_table_additional_columns_sql', [
+    'company',
+]);
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
-    'clientid',
-    'hash',
+    'company',
+    db_prefix() . 'peralatan.hash',
 ]);
 
 $output  = $result['output'];
@@ -101,8 +102,8 @@ foreach ($rResult as $aRow) {
 
     $row[] = $numberOutput;
 
-    $row[] = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id'] .'#/'. $aRow[db_prefix() . 'peralatan.id']) . '" onclick="init_peralatan(' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">' . $aRow['subject'] . ' bb</a>';
-    $toOutput = $toOutput = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['peralatan_to'] . '</a>';
+    $row[] = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id'] .'#/'. $aRow[db_prefix() . 'peralatan.id']) . '" onclick="init_peralatan(' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">' . $aRow['subject'] . '</a>';
+    $toOutput = $toOutput = '<a href="' . admin_url('clients/client/' . $aRow['clientid']) . '" target="_blank" data-toggle="tooltip" data-title="' . _l('client') . '">' . $aRow['company'] . '</a>';
 
     $row[] = $toOutput;
 
@@ -113,15 +114,15 @@ foreach ($rResult as $aRow) {
     $row[] = _d($aRow['open_till']);
 
 
-    $row[] = _d($aRow['datecreated']);
+    $row[] = _d($aRow[db_prefix() . 'peralatan.datecreated']);
             $statuses = $this->ci->peralatan_model->get_statuses();
             
 
     $dropdown =        '<div class="btn-group btn-group-status">';
-    $dropdown .=          format_peralatan_dropdown($aRow['status']);
+    $dropdown .=          format_peralatan_dropdown($aRow[db_prefix() . 'peralatan.status']);
     $dropdown .=          '<div class="dropdown-menu status">';
                             foreach ($statuses as $peralatanChangeStatus) {
-                                if ($aRow['status'] != $peralatanChangeStatus) {
+                                if ($aRow[db_prefix() . 'peralatan.status'] != $peralatanChangeStatus) {
                                     $dropdown .= 
                                     '<li class="'. strtolower(format_peralatan_dropdown($peralatanChangeStatus,'',false)) .'">
                                         <a href="#" onclick="peralatan_mark_action_status(' . $peralatanChangeStatus . ',' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">

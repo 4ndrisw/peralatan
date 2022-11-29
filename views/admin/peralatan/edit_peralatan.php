@@ -142,8 +142,8 @@
                 </div>
                 <?php $value = (isset($peralatan) ? $peralatan->peralatan_to : ''); ?>
                 <?php echo render_input('peralatan_to', 'peralatan_to', $value); ?>
-                <?php $value = (isset($peralatan) ? $peralatan->address : ''); ?>
-                <?php echo render_textarea('address', 'peralatan_address', $value); ?>
+                <?php $value = (isset($peralatan) ? $peralatan->lokasi : ''); ?>
+                <?php echo render_textarea('lokasi', 'peralatan_lokasi', $value); ?>
 
               </div>
             </div>
@@ -179,6 +179,7 @@
       if ($(this).val() != '') {
         $.get(admin_url + 'peralatan/get_relation_data_values/' + $(this).val(), function(response) {
           $('input[name="peralatan_to"]').val(response.to);
+          $('textarea[name="lokasi"]').val(response.lokasi);
           $('textarea[name="address"]').val(response.address);
           $('input[name="email"]').val(response.email);
           $('input[name="phone"]').val(response.phone);
