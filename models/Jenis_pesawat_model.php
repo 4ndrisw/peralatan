@@ -66,13 +66,13 @@ class Jenis_pesawat_model extends App_Model
      */
     public function get($id = '')
     {
-        $this->db->from(db_prefix() . 'jenis_pesawat');
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'jenis_pesawat.id', $id);
-            return $this->db->get()->row();
+            return $this->db->get(db_prefix() . 'jenis_pesawat')->row();
+        }else{
+            return $this->db->get(db_prefix() . 'jenis_pesawat')->result();            
         }
 
-        return $this->db->get()->result();
     }
 
     public function get_grouped()

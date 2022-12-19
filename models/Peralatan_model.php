@@ -871,7 +871,7 @@ class Peralatan_model extends App_Model
             }
         }
         $data->company = $_data->company;
-        $data->lokasi = clear_textarea_breaks($_data->lokasi);
+        //$data->lokasi = clear_textarea_breaks($_data->lokasi);
         $data->zip     = $_data->zip;
         $data->country = $_data->country;
         $data->state   = $_data->state;

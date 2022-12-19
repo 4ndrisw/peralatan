@@ -4,6 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $baseCurrency = get_base_currency();
 
+$staff_id = get_staff_user_id();
+$current_user = get_client_type($staff_id);
+$company_id = $current_user->client_id;
+
 $aColumns = [
     db_prefix() . 'peralatan.id',
     'subject',
@@ -64,8 +68,33 @@ if (count($filter) > 0) {
     array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
 }
 
+
+if (isset($company_id) && $company_id != '') {
+   if(strtolower($current_user->client_type) == 'company'){
+     array_push($where, 'AND ' . db_prefix() . 'peralatan.clientid=' . $this->ci->db->escape_str($company_id));
+   } 
+}
+
 if (!has_permission('peralatan', '', 'view')) {
     array_push($where, 'AND ' . get_peralatan_sql_where_staff(get_staff_user_id()));
+}
+
+
+if (!is_admin() && has_permission('perlatan', '', 'view_perlatan_in_inpectors')){
+    $inspector_id = get_inspector_id_by_staff_id($staff_id);
+    array_push($where, 'AND ' . db_prefix() . 'perlatan.inspector_id =' . $this->ci->db->escape_str($inspector_id));
+}
+
+if(is_surveyor_staff($staff_id)){
+    $surveyor_id = get_surveyor_id_by_staff_id($staff_id);
+    $userWhere = 'AND surveyor_id = ' . $this->ci->db->escape_str($surveyor_id);
+    array_push($where, $userWhere);
+
+}
+
+if (!is_admin() && has_permission('perlatan', '', 'view_perlatan_in_institutions')){
+    $institution_id = get_institution_id_by_staff_id($staff_id);
+    array_push($where, 'AND ' . db_prefix() . 'perlatan.institution_id =' . $this->ci->db->escape_str($institution_id));
 }
 
 $join = [
