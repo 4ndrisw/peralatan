@@ -51,13 +51,18 @@
                        $selected = (isset($customer_id) ? $customer_id: '');
                      }
                      if($selected != ''){
-                        $rel_data = get_relation_data('customer',$selected);
-                        $rel_val = get_relation_values($rel_data,'customer');
+                        $rel_data = apps_get_relation_data('companies',$selected);
+                        $rel_val = apps_get_relation_values($rel_data,'companies');
                         echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                      } ?>
                     </select>
                   </div>
                 </div>
+                <?php
+                var_dump($rel_data);
+
+                ?> 
+
 
                 <div class="row">
                   <div class="col-md-6">
@@ -173,7 +178,7 @@
   $(function() {
     //init_currency();
     // Maybe items ajax search
-    init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url + 'items/search');
+    //init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url + 'items/search');
     validate_peralatan_form();
     $('body').on('change', '#clientid', function() {
       if ($(this).val() != '') {

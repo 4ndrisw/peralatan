@@ -51,8 +51,10 @@
                        $selected = (isset($customer_id) ? $customer_id: '');
                      }
                      if($selected != ''){
-                        $rel_data = get_relation_data('customer',$selected);
-                        $rel_val = get_relation_values($rel_data,'customer');
+                        log_activity(json_encode($selected));
+                        $rel_data = apps_get_relation_data('companies',$selected);
+                        log_activity(json_encode($rel_data));
+                        $rel_val = apps_get_relation_values($rel_data,'companies');
                         echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                      } ?>
                     </select>
@@ -223,7 +225,9 @@
     var serverData = {};
     serverData.clientid = _clientid.val();
     data.type = _rel_type.val();
-    init_ajax_search(_rel_type.val(), _clientid, serverData);
+    //init_ajax_search(_rel_type.val(), _clientid, serverData);
+    apps_ajax_search(_rel_type.val(), _clientid, serverData);
+
   }
 
   function validate_peralatan_form() {
