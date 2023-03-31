@@ -35,11 +35,6 @@ add_option('peralatan_number_decrement_on_delete', 0);
 add_option('peralatan_number_format', 4);
 add_option('peralatan_year', date('Y'));
 add_option('exclude_peralatan_from_client_area_with_draft_status', 1);
-add_option('predefined_client_note_peralatan', '- Staf diatas untuk melakukan riksa uji pada peralatan tersebut.
-- Staf diatas untuk membuat dokumentasi riksa uji sesuai kebutuhan.');
-add_option('predefined_terms_peralatan', '- Pelaksanaan riksa uji harus mengikuti prosedur yang ditetapkan peralatan pemilik alat.
-- Dilarang membuat dokumentasi tanpa seizin peralatan pemilik alat.
-- Dokumen ini diterbitkan dari sistem CRM, tidak memerlukan tanda tangan dari PT. Cipta Mas Jaya');
 add_option('peralatan_due_after', 1);
 add_option('allow_staff_view_peralatan_assigned', 1);
 add_option('show_assigned_on_peralatan', 1);

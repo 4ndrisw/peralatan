@@ -11,6 +11,7 @@ class Peralatan extends AdminController
     {
         parent::__construct();
         $this->load->model('peralatan_model');
+        $this->load->model('clients_model');
         $this->load->model('jenis_pesawat_model');
         $this->load->model('currencies_model');
         include_once(module_libs_path('peralatan') . 'mails/Peralatan_mail_template.php');
@@ -30,7 +31,7 @@ class Peralatan extends AdminController
 
     public function list_peralatan($peralatan_id = '')
     {
-        close_setup_menu();
+        //close_setup_menu();
 
         if (!has_permission('peralatan', '', 'view') && !has_permission('peralatan', '', 'view_own') && get_option('allow_staff_view_peralatan_assigned') == 0) {
             access_denied('peralatan');
@@ -62,13 +63,9 @@ class Peralatan extends AdminController
             $data['title']                 = _l('peralatan');
             $data['statuses']              = $this->peralatan_model->get_statuses();
             //$data['peralatan_sale_agents'] = $this->peralatan_model->get_sale_agents();
-            $data['years']                 = $this->peralatan_model->get_peralatan_years();
+            $data['years']                 = $this->peralatan_model->get_peralatan_open_till();
 
-            if ($peralatan_id) {
-                $this->load->view('admin/peralatan/manage_small_table', $data);
-            } else {
-                $this->load->view('admin/peralatan/manage_table', $data);
-            }
+            $this->load->view('admin/peralatan/manage_table', $data);
         }
     }
 
@@ -229,13 +226,37 @@ class Peralatan extends AdminController
 
     public function add_peralatan($id = '')
     {
+
+        $staff_id = get_staff_user_id();
+        $current_user = get_client_type($staff_id);
+        $company_id = $current_user->client_id;
+        $company_name = get_company_name($current_user->client_id);
+        
+        $client = get_client($company_id);
+        if(!is_admin() && (is_null($client->institution_id) || is_null($client->inspector_id) || is_null($client->inspector_staff_id))){
+            access_denied('peralatan');
+        }
+
         if ($this->input->post()) {
             $peralatan_data = $this->input->post();
+
+            if($current_user->client_type == 'Company' || $current_user->client_type == 'company'){
+                $peralatan_data['clientid'] = $company_id;
+                $peralatan_data['peralatan_to'] = $company_name;
+            }
+
             if ($id == '') {
                 if (!has_permission('peralatan', '', 'create')) {
                     access_denied('peralatan');
                 }
+                
+                $jenis_pesawat = $this->jenis_pesawat_model->get($peralatan_data['jenis_pesawat_id']);
+                //$peralatan_data['jenis_pesawat_id'] = $jenis_pesawat->id;
+                $peralatan_data['jenis_pesawat'] = $jenis_pesawat->description;
+                $peralatan_data['kelompok_alat_id'] = $jenis_pesawat->group_id;
+                
                 $id = $this->peralatan_model->add($peralatan_data);
+                
                 if ($id) {
                     set_alert('success', _l('added_successfully', _l('peralatan')));
                     if ($this->set_peralatan_pipeline_autoload($id)) {
@@ -253,11 +274,12 @@ class Peralatan extends AdminController
         $this->load->model('jenis_pesawat_model');
         $data['jenis_pesawat'] = $this->peralatan_model->get_jenis_pesawat();
 
-
         $data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
 
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
+
+        $data['client_type']         = isset($current_user->client_type) ? $current_user->client_type : '';
 
         $data['title'] = $title;
         $this->load->view('admin/peralatan/add_peralatan', $data);
@@ -314,8 +336,8 @@ class Peralatan extends AdminController
         //$data['kelompok_alat'] = $this->jenis_pesawat_model->get_groups();
         $data['statuses']      = $this->peralatan_model->get_statuses();
         $data['staff']         = $this->staff_model->get('', ['active' => 1]);
-        $data['currencies']    = $this->currencies_model->get();
-        $data['base_currency'] = $this->currencies_model->get_base_currency();
+        //$data['currencies']    = $this->currencies_model->get();
+        //$data['base_currency'] = $this->currencies_model->get_base_currency();
 
         $data['title'] = $title;
         $this->load->view('admin/peralatan/edit_peralatan', $data);
@@ -439,6 +461,8 @@ class Peralatan extends AdminController
         $data['members']               = $this->staff_model->get('', ['active' => 1]);
         $data['peralatan_merge_fields'] = $merge_fields;
         $data['peralatan']              = $peralatan;
+        $data['company']              = $this->clients_model->get($peralatan->clientid);
+
         $data['totalNotes']            = total_rows(db_prefix() . 'notes', ['rel_id' => $id, 'rel_type' => 'peralatan']);
 
         if ($to_return == false) {
@@ -910,4 +934,22 @@ class Peralatan extends AdminController
             }
         }
     }
+
+/*
+    public function get_relation_data()
+    {        
+        if ($this->input->post()) {
+            $type = $this->input->post('type');
+            $data = apps_get_relation_data($type, '', $this->input->post('extra'));
+            if ($this->input->post('rel_id')) {
+                $rel_id = $this->input->post('rel_id');
+            } else {
+                $rel_id = '';
+            }
+            $relOptions = apps_init_relation_options($data, $type, $rel_id);
+            echo json_encode($relOptions);
+            die;
+        }
+    }
+*/ 
 }

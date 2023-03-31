@@ -249,8 +249,8 @@
                      </div>
                      <div class="col-md-6 text-right">
                         <address>
-                           <span class="bold"><?php echo _l('peralatan_to'); ?>:</span><br />
-                           <?php echo format_peralatan_info($peralatan,'admin'); ?>
+                           <span class="bold"><?php echo _l('company'); ?>:</span><br />
+                           <?php echo format_company_info($company,'company'); ?>
                         </address>
                      </div>
                   </div>

@@ -92,11 +92,11 @@ function get_peralatan_shortlink($peralatan)
 function check_peralatan_restrictions($id, $hash)
 {
     $CI = &get_instance();
-    $CI->load->model('peralatan_model');
+    $CI->load->model('Peralatan_model');
     if (!$hash || !$id) {
         show_404();
     }
-    $peralatan = $CI->peralatan_model->get($id);
+    $peralatan = $CI->Peralatan_model->get($id);
     if (!$peralatan || ($peralatan->hash != $hash)) {
         show_404();
     }
@@ -416,13 +416,13 @@ if (!function_exists('format_peralatan_info')) {
     function format_peralatan_info($peralatan, $for = '')
     {
         $format = get_option('company_info_format');
-        $countryCode = '';
-        $countryName = '';
 
         if ($country = get_country($peralatan->country)) {
             $countryCode = $country->iso2;
             $countryName = $country->short_name;
         }
+        $countryCode = '';
+        $countryName = '';
 
         $peralatanTo = '<b>' . $peralatan->peralatan_to . '</b>';
         $phone      = $peralatan->phone;
@@ -437,35 +437,44 @@ if (!function_exists('format_peralatan_info')) {
             $phone = '<a href="tel:' . $peralatan->phone . '">' . $peralatan->phone . '</a>';
             $email = '<a href="mailto:' . $peralatan->email . '">' . $peralatan->email . '</a>';
         }
+        $peralatanState = isset($peralatan->state) ? $peralatan->state : '';
 
-        $format = _info_format_replace('company_name', $peralatanTo, $format);
-        $format = _info_format_replace('address', $peralatan->address . ' ' . $peralatan->city, $format);
+        if(isset($peralatan->zip)){
+            $peralatanState = $peralatanState . ' ' . $peralatan->zip;
+        }
 
-        $format = _info_format_replace('city', NULL, $format);
-        $format = _info_format_replace('state', $peralatan->state . ' ' . $peralatan->zip, $format);
+        $format = _apps_format_replace('company_name', $peralatanTo, $format);
+        $format = _apps_format_replace('address', $peralatan->address . ' ' . $peralatan->city, $format);
 
-        $format = _info_format_replace('country_code', $countryCode, $format);
-        $format = _info_format_replace('country_name', $countryName, $format);
+        $format = _apps_format_replace('city', '', $format);
+        $format = _apps_format_replace('state', $peralatanState, $format);
 
-        $format = _info_format_replace('zip_code', '', $format);
-        $format = _info_format_replace('phone', $phone, $format);
-        $format = _info_format_replace('email', $email, $format);
-        $format = _info_format_replace('vat_number_with_label', NULL, $format);
+        $format = _apps_format_replace('country_code', $countryCode, $format);
+        $format = _apps_format_replace('country_name', $countryName, $format);
+
+        $format = _apps_format_replace('zip_code', '', $format);
+        $format = _apps_format_replace('phone', $phone, $format);
+        $format = _apps_format_replace('email', $email, $format);
+        $format = _apps_format_replace('vat_number_with_label', 'cc', $format);
+
 
         $whereCF = [];
         if (is_custom_fields_for_customers_portal()) {
             $whereCF['show_on_client_portal'] = 1;
         }
+        /*
         $customFieldsProposals = get_custom_fields('peralatan', $whereCF);
 
         foreach ($customFieldsProposals as $field) {
             $value  = get_custom_field_value($peralatan->id, $field['id'], 'peralatan');
             $format = _info_format_custom_field($field['id'], $field['name'], $value, $format);
         }
+        */
 
         // If no custom fields found replace all custom fields merge fields to empty
-        $format = _info_format_custom_fields_check($customFieldsProposals, $format);
+        //$format = _info_format_custom_fields_check($customFieldsProposals, $format);
         $format = _maybe_remove_first_and_last_br_tag($format);
+
 
         // Remove multiple white spaces
         $format = preg_replace('/\s+/', ' ', $format);
@@ -597,9 +606,9 @@ function peralatan_content_tab_peralatan($client){
                      <label for="is_preffered"><?php echo _l('preffered_peralatan'); ?></label>
                   </div>
     <?php 
-        $CI->load->model(PERALATAN_MODULE_NAME.'/peralatan_model');
-        $data['statuses']              = $CI->peralatan_model->get_statuses();
-        $data['years']                 = $CI->peralatan_model->get_peralatan_years();
+        $CI->load->model(PERALATAN_MODULE_NAME.'/Peralatan_model');
+        $data['statuses']              = $CI->Peralatan_model->get_statuses();
+        $data['years']                 = $CI->Peralatan_model->get_peralatan_years();
         $data['client'] = $client;
         $data['CI'] = $CI;
         if(isset($client)){ 
@@ -612,24 +621,31 @@ function peralatan_content_tab_peralatan($client){
 
 function get_jenis_pesawat($jenis_pesawat_id = ''){
     $CI  = &get_instance();
-    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
-    $CI->load->model('jenis_pesawat_model');
-    return $CI->jenis_pesawat_model->get($jenis_pesawat_id);
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/Jenis_pesawat_model.php');
+    $CI->load->model('Jenis_pesawat_model');
+    return $CI->Jenis_pesawat_model->get($jenis_pesawat_id);
 }
 
 function get_kelompok_alat($kelompok_alat_id = ''){
     $CI  = &get_instance();
-    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
-    $CI->load->model('jenis_pesawat_model');
-    return $CI->jenis_pesawat_model->get_category($kelompok_alat_id);
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/Jenis_pesawat_model.php');
+    $CI->load->model('Jenis_pesawat_model');
+    return $CI->Jenis_pesawat_model->get_category($kelompok_alat_id);
 }
 
 function get_peralatan($id = ''){
     $CI  = &get_instance();
-    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/peralatan_model.php');
-    $CI->load->model('peralatan_model');
+    include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/Peralatan_model.php');
+    $CI->load->model('Peralatan_model');
 
-    return $CI->peralatan_model->get($id, []);
+    return $CI->Peralatan_model->get($id, []);
 }
 
 
+
+function create_peralatan_activity($id, $subject , $client= false, $additional_data = [])
+{
+    $CI = &get_instance();
+    $CI->load->model('Peralatan_model');
+    $CI->log_peralatan_activity($id, $subject, $client, serialize($additional_data));
+}

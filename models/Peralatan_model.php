@@ -39,6 +39,11 @@ class Peralatan_model extends App_Model
         return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM ' . db_prefix() . 'peralatan')->result_array();
     }
 
+    public function get_peralatan_open_till()
+    {
+        return $this->db->query('SELECT DISTINCT(YEAR(open_till)) as year FROM ' . db_prefix() . 'peralatan')->result_array();
+    }
+
 
     /**
      * Performs peralatan totals status
@@ -183,7 +188,7 @@ class Peralatan_model extends App_Model
                     'status'    => $completedStatus->id,
                 ]);
             }
-
+            /*
             if (isset($custom_fields)) {
                 handle_custom_fields_post($insert_id, $custom_fields);
             }
@@ -195,7 +200,7 @@ class Peralatan_model extends App_Model
                     _maybe_insert_post_item_tax($itemid, $item, $insert_id, 'peralatan');
                 }
             }
-            
+            */
             $peralatan = $this->get($insert_id);
             if ($peralatan->assigned != 0) {
                 if ($peralatan->assigned != get_staff_user_id()) {
@@ -214,14 +219,7 @@ class Peralatan_model extends App_Model
                 }
             }
 
-            if ($data['rel_type'] == 'lead') {
-                $this->load->model('leads_model');
-                $this->leads_model->log_lead_activity($data['clientid'], 'not_lead_activity_created_peralatan', false, serialize([
-                    '<a href="' . admin_url('peralatan/list_peralatan/' . $insert_id) . '" target="_blank">' . $data['subject'] . '</a>',
-                ]));
-            }
-
-            update_sales_total_tax_column($insert_id, 'peralatan', db_prefix() . 'peralatan');
+            //update_sales_total_tax_column($insert_id, 'peralatan', db_prefix() . 'peralatan');
 
             log_activity('New Peralatan Created [ID: ' . $insert_id . ']');
 
@@ -229,7 +227,7 @@ class Peralatan_model extends App_Model
                 $this->send_peralatan_to_email($insert_id);
             }
 
-            hooks()->do_action('peralatan_created', $insert_id);
+            hooks()->do_action('peralatan_created', $peralatan);
 
             return $insert_id;
         }
@@ -280,7 +278,17 @@ class Peralatan_model extends App_Model
         unset($data['long_description']);
 
         $this->db->where('id', $id);
+
+        /*
+        echo '<pre>';
+        var_dump($data);
+        echo '</pre>';
+        die();
+        */
+
         $this->db->update(db_prefix() . 'peralatan', $data);
+
+
         if ($this->db->affected_rows() > 0) {
 
             $peralatan = $this->get($id);            
@@ -786,7 +794,7 @@ class Peralatan_model extends App_Model
             $this->db->delete(db_prefix() . 'peralatan_comments');
             // Get related tasks
             $this->db->where('rel_type', 'peralatan');
-            $this->db->where('clientid', $id);
+            //$this->db->where('clientid', $id);
 
             $tasks = $this->db->get(db_prefix() . 'tasks')->result_array();
             foreach ($tasks as $task) {
@@ -992,7 +1000,7 @@ class Peralatan_model extends App_Model
         $this->db->where('rel_id', $id);
         $this->db->where('rel_type', 'peralatan');
         $this->db->order_by('date', 'desc');
-
+        $this->db->limit('5');
         return $this->db->get(db_prefix() . 'peralatan_activity')->result_array();
     }
 

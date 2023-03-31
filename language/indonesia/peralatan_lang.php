@@ -55,3 +55,4 @@ $lang['peralatan_preview_template'] = 'Preview';
 $lang['peralatan_dt_tbl_to'] = 'Pemilik';
 $lang['nomor_seri'] = 'Nomor seri';
 $lang['nomor_unit'] = 'Nomor unit';
+$lang['peralatan_view_activity_tooltip']           = 'Log Aktivitas';

@@ -317,7 +317,7 @@
       var serverData = {};
       serverData.clientid = _clientid.val();
       data.type = _rel_type.val();
-      init_ajax_search(_rel_type.val(),_clientid,serverData);
+      apps_ajax_search(_rel_type.val(),_clientid,serverData);
    }
    function validate_peralatan_form(){
       appValidateForm($('#peralatan-form'), {

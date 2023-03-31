@@ -44,17 +44,15 @@
                 
                 <div class="form-group select-placeholder" id="rel_id_wrapper">
                   <div class="form-group select-placeholder">
-                    <label for="clientid" class="control-label"><?php echo _l('peralatan_select_customer'); ?></label>
-                    <select id="clientid" name="clientid" data-live-search="true" data-width="100%" class="ajax-search<?php if(isset($peralatan) && empty($peralatan->clientid)){echo ' customer-removed';} ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                    <label for="client_id" class="control-label"><?php echo _l('peralatan_select_customer'); ?></label>
+                    <select id="client_id" name="clientid" data-live-search="true" data-width="100%" class="ajax-search<?php if(isset($peralatan) && empty($peralatan->clientid)){echo ' customer-removed';} ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                    <?php $selected = (isset($peralatan) ? $peralatan->clientid : '');
                      if($selected == ''){
                        $selected = (isset($customer_id) ? $customer_id: '');
                      }
                      if($selected != ''){
-                        log_activity(json_encode($selected));
-                        $rel_data = apps_get_relation_data('companies',$selected);
-                        log_activity(json_encode($rel_data));
-                        $rel_val = apps_get_relation_values($rel_data,'companies');
+                        $rel_data = apps_get_relation_data('company',$selected);
+                        $rel_val = apps_get_relation_values($rel_data,'company');
                         echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
                      } ?>
                     </select>
@@ -168,16 +166,16 @@
 </div>
 <?php init_tail(); ?>
 <script>
-  var _clientid = $('#clientid'),
-    _clientid_wrapper = $('#clientid_wrapper'),
+  var _clientid = $('#client_id'),
+    _clientid_wrapper = $('#rel_id_wrapper'),
     data = {};
 
   $(function() {
     //init_currency();
     // Maybe items ajax search
-    init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url + 'items/search');
+    apps_ajax_search("company", "#client_id.ajax-search");
     validate_peralatan_form();
-    $('body').on('change', '#clientid', function() {
+    $('body').on('change', '#client_id', function() {
       if ($(this).val() != '') {
         $.get(admin_url + 'peralatan/get_relation_data_values/' + $(this).val(), function(response) {
           $('input[name="peralatan_to"]').val(response.to);
@@ -220,7 +218,7 @@
 
 
   });
-
+/*
   function peralatan_clientid_select() {
     var serverData = {};
     serverData.clientid = _clientid.val();
@@ -229,7 +227,7 @@
     apps_ajax_search(_rel_type.val(), _clientid, serverData);
 
   }
-
+*/
   function validate_peralatan_form() {
     appValidateForm($('#peralatan-form'), {
       subject: 'required',

@@ -52,3 +52,4 @@ $lang['peralatan_preview_template'] = 'Preview';
 $lang['peralatan_dt_tbl_to'] = 'Owner';
 $lang['nomor_seri'] = 'Serial Number';
 $lang['nomor_unit'] = 'Unit Number';
+$lang['peralatan_view_activity_tooltip']           = 'Activity Log';

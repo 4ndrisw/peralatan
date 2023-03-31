@@ -36,6 +36,8 @@ if (!$CI->db->table_exists(db_prefix() . 'peralatan')) {
       `status` int(11) NOT NULL,
       `peralatan_id` int(11) DEFAULT NULL,
       `invoice_id` int(11) DEFAULT NULL,
+      `nomor_seri` varchar(30) DEFAULT NULL,
+      `nomor_unit` varchar(30) DEFAULT NULL,
       `date_converted` datetime DEFAULT NULL,
       `pipeline_order` int(11) DEFAULT 1,
       `is_expiry_notified` int(11) NOT NULL DEFAULT 0,

@@ -3,21 +3,23 @@
 <div id="wrapper">
   <div class="content accounting-template peralatan">
     <div class="row">
-      <?php
-      if (isset($peralatan)) {
-        echo form_hidden('isedit', $peralatan->id);
-      }
-      if (isset($peralatan) || $this->input->get('clientid')) {
-        if ($this->input->get('clientid')) {
-          $clientid = $this->input->get('clientid');
-          $rel_type = $this->input->get('rel_type');
-        } else {
-          $clientid = $peralatan->clientid;
-          $rel_type = $peralatan->rel_type;
-        }
-      }
-      ?>
-      <?php
+         <?php
+         if(isset($peralatan)){
+             echo form_hidden('isedit',$peralatan->id);
+            }
+            $rel_type = '';
+            $clientid = '';
+            if(isset($peralatan) || ($this->input->get('clientid') && $this->input->get('rel_type'))){
+             if($this->input->get('clientid')){
+               $clientid = $this->input->get('clientid');
+               $rel_type = $this->input->get('rel_type');
+             } else {
+               $clientid = $peralatan->clientid;
+               $rel_type = $peralatan->rel_type;
+             }
+            }
+            ?>
+         <?php
       echo form_open($this->uri->uri_string(), array('id' => 'peralatan-form', 'class' => '_transaction_form peralatan-form'));
 
       if ($this->input->get('peralatan_request_id')) {
@@ -42,26 +44,26 @@
                 <?php echo render_input('subject', 'peralatan_subject', $value, 'text', $attrs); ?>
                 
                 
-                <div class="form-group select-placeholder" id="rel_id_wrapper">
-                  <div class="form-group select-placeholder">
-                    <label for="clientid" class="control-label"><?php echo _l('peralatan_select_customer'); ?></label>
-                    <select id="clientid" name="clientid" data-live-search="true" data-width="100%" class="ajax-search<?php if(isset($peralatan) && empty($peralatan->clientid)){echo ' customer-removed';} ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                   <?php $selected = (isset($peralatan) ? $peralatan->clientid : '');
-                     if($selected == ''){
-                       $selected = (isset($customer_id) ? $customer_id: '');
-                     }
-                     if($selected != ''){
-                        $rel_data = apps_get_relation_data('companies',$selected);
-                        $rel_val = apps_get_relation_values($rel_data,'companies');
-                        echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
-                     } ?>
-                    </select>
-                  </div>
-                </div>
-                <?php
-                var_dump($rel_data);
+                <?php if(strtolower($client_type) !== 'company') { ?>
+                  <div class="form-group select-placeholder" id="rel_id_wrapper">
+                    <div class="form-group select-placeholder">
+                      <label for="client_id" class="control-label"><?php echo _l('peralatan_select_customer'); ?></label>
+                      <select id="client_id" name="clientid" data-live-search="true" data-width="100%" class="ajax-search<?php if(isset($peralatan) && empty($peralatan->clientid)){echo ' customer-removed';} ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                     <?php $selected = (isset($peralatan) ? $peralatan->client_id : '');
+                       if($selected == ''){
+                         $selected = (isset($customer_id) ? $customer_id: '');
+                       }
+                       if($selected != ''){
+                          $rel_data = apps_get_relation_data('companies',$selected);
+                          $rel_val = apps_get_relation_values($rel_data,'companies');
+                          echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>';
+                       } 
 
-                ?> 
+                       ?>
+                      </select>
+                    </div>
+                  </div>
+                <?php } ?> 
 
 
                 <div class="row">
@@ -146,7 +148,10 @@
 
                 </div>
                 <?php $value = (isset($peralatan) ? $peralatan->peralatan_to : ''); ?>
-                <?php echo render_input('peralatan_to', 'peralatan_to', $value); ?>
+                <?php if(strtolower($client_type) !== 'company') { ?>
+                  <?php echo render_input('peralatan_to', 'peralatan_to', $value); ?>
+                <?php } ?>
+
                 <?php $value = (isset($peralatan) ? $peralatan->lokasi : ''); ?>
                 <?php echo render_textarea('lokasi', 'peralatan_lokasi', $value); ?>
 
@@ -171,16 +176,16 @@
 </div>
 <?php init_tail(); ?>
 <script>
-  var _clientid = $('#clientid'),
-    _clientid_wrapper = $('#clientid_wrapper'),
+  var _clientid = $('#client_id'),
+    _clientid_wrapper = $('#rel_id_wrapper'),
     data = {};
-
   $(function() {
-    //init_currency();
-    // Maybe items ajax search
-    //init_ajax_search('items', '#item_select.ajax-search', undefined, admin_url + 'items/search');
+
+    // On document read check and init for client ajax-search
+    apps_ajax_search("companies", "#client_id.ajax-search");
+
     validate_peralatan_form();
-    $('body').on('change', '#clientid', function() {
+    $('body').on('change', '#client_id', function() {
       if ($(this).val() != '') {
         $.get(admin_url + 'peralatan/get_relation_data_values/' + $(this).val(), function(response) {
           $('input[name="peralatan_to"]').val(response.to);
@@ -223,19 +228,28 @@
 
 
   });
-
+  
+  /*
   function peralatan_clientid_select() {
     var serverData = {};
     serverData.clientid = _clientid.val();
     data.type = _rel_type.val();
-    init_ajax_search(_rel_type.val(), _clientid, serverData);
+    
+    console.log(serverData);
+
+    //apps_ajax_search(_rel_type.val(), _clientid, serverData);
+    apps_ajax_search("institutions", "#client_id.ajax-search", serverData);
+
   }
+  */
+  
 
   function validate_peralatan_form() {
     appValidateForm($('#peralatan-form'), {
       subject: 'required',
       peralatan_to: 'required',
       clientid: 'required',
+      nomor_unit: 'required',
       date: 'required',
       open_till: 'required',
       jenis_pesawat_id: 'required',

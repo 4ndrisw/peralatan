@@ -70,7 +70,7 @@ if (count($filter) > 0) {
 
 
 if (isset($company_id) && $company_id != '') {
-   if(strtolower($current_user->client_type) == 'company'){
+   if($current_user->client_type == 'company' || $current_user->client_type == 'Company'){
      array_push($where, 'AND ' . db_prefix() . 'peralatan.clientid=' . $this->ci->db->escape_str($company_id));
    } 
 }
@@ -97,6 +97,12 @@ if (!is_admin() && has_permission('perlatan', '', 'view_perlatan_in_institutions
     array_push($where, 'AND ' . db_prefix() . 'perlatan.institution_id =' . $this->ci->db->escape_str($institution_id));
 }
 
+if(!is_admin() && is_staff_related_to_company($company_id)){
+    array_push($where, 'AND ('.db_prefix().'peralatan.clientid = '. $company_id . ') ');    
+}
+
+
+
 $join = [
     'JOIN '.db_prefix().'clients ON '.db_prefix().'clients.userid='.db_prefix().'peralatan.clientid',
 ];
@@ -116,10 +122,10 @@ $rResult = $result['rResult'];
 foreach ($rResult as $aRow) {
     $row = [];
 
-    //$numberOutput = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id']) . '" onclick="init_peralatan(' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . '</a>';
+    $numberOutput =   '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id']) . '" onclick="init_peralatan(' . $aRow[db_prefix() . 'peralatan.id'] . '); return false;">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . '</a>';
     //$numberOutput = '<a href="' . admin_url('peralatan#' . $aRow[db_prefix() . 'peralatan.id']) . '" target="_blank">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . ' AA</a>';
     //$numberOutput = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id']. '#' . $aRow[db_prefix() . 'peralatan.id']) . '" target="_blank">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . '</a>';
-    $numberOutput = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id']. '#' . $aRow[db_prefix() . 'peralatan.id']) . '">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . '</a>';
+    //$numberOutput = '<a href="' . admin_url('peralatan/list_peralatan/' . $aRow[db_prefix() . 'peralatan.id']. '#' . $aRow[db_prefix() . 'peralatan.id']) . '">' . format_peralatan_number($aRow[db_prefix() . 'peralatan.id']) . '</a>';
 
     $numberOutput .= '<div class="row-options">';
 
@@ -174,3 +180,4 @@ foreach ($rResult as $aRow) {
 
     $output['aaData'][] = $row;
 }
+

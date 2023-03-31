@@ -103,17 +103,17 @@
                <div class="col-md-12" id="small-table">
                   <div class="panel_s">
                      <div class="panel-body">
-                        <!-- if invoiceid found in url -->
+                        <!-- if peralatanid found in url -->
                         <?php echo form_hidden('peralatan_id',$peralatan_id); ?>
                         <?php
                            $table_data = array(
                               _l('peralatan') . ' #',
                               _l('peralatan_subject'),
                               _l('peralatan_dt_tbl_to'),
+                              _l('surveyor'),
                               _l('nomor_seri'),
                               _l('nomor_unit'),
                               _l('peralatan_open_till'),
-                              _l('peralatan_date_created'),
                               _l('peralatan_status'),
                             );
 

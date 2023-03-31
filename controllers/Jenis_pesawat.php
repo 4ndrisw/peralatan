@@ -9,7 +9,7 @@ class Jenis_pesawat extends AdminController
     public function __construct()
     {
         parent::__construct();
-        include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/jenis_pesawat_model.php');
+        include_once(APP_MODULES_PATH . PERALATAN_MODULE_NAME . '/models/Jenis_pesawat_model.php');
         $this->load->model('jenis_pesawat_model');
     }
 

@@ -338,6 +338,7 @@ function get_peralatan_item_preview_values() {
 }
 
 // Append the added items to the preview to the table as items
+/*
 function add_peralatan_item_to_table(data, itemid){
 
   // If not custom data passed get from the preview
@@ -404,6 +405,7 @@ function add_peralatan_item_to_table(data, itemid){
 
   return false;
 }
+*/
 
 
 // From peralatan table mark as
